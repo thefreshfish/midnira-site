@@ -1,0 +1,1279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Midnira | AI operations and penetration testing</title>
+<meta name="description" content="Midnira builds and runs supervised AI agents for law firms and other paper-heavy businesses, and performs agent-assisted penetration tests led by a certified operator.">
+<link rel="canonical" href="https://midnira.ai/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Midnira">
+<meta property="og:title" content="Midnira | AI operations and penetration testing">
+<meta property="og:description" content="Supervised AI agents that run your operations and test your defenses.">
+<meta property="og:url" content="https://midnira.ai/">
+<meta property="og:image" content="https://midnira.ai/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#080A1F">
+<link rel="icon" href="favicon.png" type="image/png" sizes="64x64">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=Source+Serif+4:opsz,wght@8..60,400..700&display=swap">
+<style>
+/* Layout: one night on a 24-hour dial. A poster line sits over a large dial
+   that plots an example night; below it, working exhibits (a morning approval
+   queue, a scope gate, a report page) show the practice instead of describing
+   it. Everything is left-aligned. The page ends at dawn, on light ground.
+   Blue is what agents do. Lamp amber is what people decide. Paper speaks in
+   serif; everything else is one sans family whose width axis does the work. */
+:root {
+  color-scheme: dark;
+  --night-0: #080A1F;      /* the page ground */
+  --night-1: #0E1130;      /* raised bands and panels */
+  --night-2: #181C47;      /* cards on a panel */
+  --rule: #2A3066;         /* lines that carry structure */
+  --moon: #EEECE4;         /* primary text */
+  --mist: #B6BBD8;         /* running text */
+  --dim: #868DB6;          /* secondary text */
+  --agent: #93ABFF;        /* what agents do */
+  --lamp: #FFB659;         /* what people decide */
+  --lamp-hi: #FFC983;
+  --lamp-ink: #2B1700;
+  --ok: #7ED9B7;
+  --stop: #FF8F8F;
+  --paper: #F2EEE3;        /* documents */
+  --ink: #1B1838;
+  --ink-soft: #4D496B;
+  --ink-blue: #3348B8;     /* stamp inks on paper */
+  --ink-amber: #A65800;
+  --dawn-1: #1C1B4D;
+  --dawn-2: #4C2F6C;
+  --dawn-3: #A85674;
+  --dawn-4: #EA8B6B;
+  --dawn-5: #F7C088;
+  --day: #FBEAD0;          /* first light, where the page ends */
+  --sans: "Archivo", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --serif: "Source Serif 4", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --code: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  margin: 0;
+  background: var(--night-0);
+  color: var(--moon);
+  font: 400 1.0625rem/1.6 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  z-index: 10;
+  background: var(--night-0);
+}
+h1, h2, h3, h4, p, dl, dd, ol, ul, figure { margin: 0; }
+ol, ul { padding: 0; list-style: none; }
+h1, h2, h3 { text-wrap: balance; }
+p { text-wrap: pretty; }
+a { color: inherit; }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--lamp); outline-offset: 3px; border-radius: 3px; }
+
+.wrap {
+  width: 100%;
+  max-width: 78rem;
+  margin-inline: auto;
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
+}
+.skip {
+  position: absolute;
+  left: -999rem;
+  top: 0;
+  z-index: 20;
+  padding: .6rem 1rem;
+  background: var(--lamp);
+  color: var(--lamp-ink);
+  font-weight: 650;
+}
+.skip:focus { left: max(20px, env(safe-area-inset-left, 0px)); top: calc(env(safe-area-inset-top, 0px) + .5rem); }
+
+/* Type roles */
+.poster {
+  max-width: 64rem;
+  font-weight: 760;
+  font-stretch: 84%;
+  font-size: clamp(2.7rem, 5.4vw + 1rem, 5.6rem);
+  line-height: .98;
+  letter-spacing: -.022em;
+}
+.headline {
+  font-weight: 720;
+  font-stretch: 88%;
+  font-size: clamp(2rem, 2.7vw + 1.15rem, 3.5rem);
+  line-height: 1.03;
+  letter-spacing: -.018em;
+}
+.heading { font-weight: 680; font-stretch: 94%; font-size: 1.4rem; line-height: 1.2; letter-spacing: -.008em; }
+.lede { font-size: clamp(1.0625rem, .45vw + 1rem, 1.25rem); line-height: 1.55; color: var(--mist); max-width: 40rem; }
+.fine { font-size: .875rem; line-height: 1.5; color: var(--dim); }
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: .55rem 1.2rem;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  background: none;
+  font: 650 .9375rem/1.2 var(--sans);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color .15s, border-color .15s;
+}
+.btn-lamp { background: var(--lamp); color: var(--lamp-ink); }
+.btn-lamp:hover { background: var(--lamp-hi); }
+.btn-quiet { border-color: var(--rule); color: var(--moon); }
+.btn-quiet:hover { border-color: var(--mist); }
+.btn-small { min-height: 2.25rem; padding: .35rem .9rem; font-size: .875rem; }
+.textlink { color: var(--moon); text-decoration: underline; text-decoration-color: var(--dim); text-underline-offset: .22em; }
+.textlink:hover { text-decoration-color: var(--lamp); }
+button.textlink { padding: 0; border: 0; background: none; cursor: pointer; font-size: .875rem; }
+
+/* Header */
+.site-header {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 9;
+  background: color-mix(in srgb, var(--night-0) 86%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.site-header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; min-height: 4rem; }
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  font-stretch: 112%;
+  letter-spacing: -.01em;
+  color: var(--moon);
+  text-decoration: none;
+}
+.brand svg { width: 1.75rem; height: 1.75rem; flex: none; overflow: visible; }
+.orbit { transform-origin: 16px 17px; }
+.orbit-dot { fill: var(--lamp); }
+.nav { display: flex; align-items: center; gap: 1.75rem; }
+.nav a:not(.btn) { color: var(--mist); text-decoration: none; font-size: .9375rem; }
+.nav a:not(.btn):hover { color: var(--moon); }
+@media (max-width: 880px) { .nav a:not(.btn) { display: none; } }
+
+/* Hero */
+.hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(36rem 36rem at 27% 72%, color-mix(in srgb, var(--agent) 13%, transparent), transparent 70%),
+    linear-gradient(180deg, var(--night-0) 0%, var(--night-1) 100%);
+}
+canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; }
+.twinkle {
+  position: absolute;
+  z-index: -1;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--moon);
+  box-shadow: 0 0 6px 1px color-mix(in srgb, var(--moon) 45%, transparent);
+  opacity: .7;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .twinkle { animation: twinkle var(--d, 6s) ease-in-out var(--o, 0s) infinite; }
+}
+@keyframes twinkle { 0%, 100% { opacity: .2; } 50% { opacity: .95; } }
+.hero .wrap { display: grid; gap: clamp(2rem, 4.5vw, 3.5rem); padding-block: clamp(3rem, 6.5vw, 5.5rem) clamp(3.5rem, 7vw, 6rem); }
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-areas: "dial copy" "dial log";
+  grid-template-rows: auto 1fr;
+  gap: 2.25rem clamp(2rem, 4.5vw, 4.5rem);
+  align-items: start;
+}
+.hero-copy { grid-area: copy; display: grid; gap: 1.6rem; justify-items: start; }
+.hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .9rem 1.5rem; }
+.jumps { display: inline-flex; flex-wrap: wrap; gap: .5rem 1.5rem; font-size: .9375rem; }
+
+/* The night dial */
+.dial-wrap { grid-area: dial; display: grid; gap: .9rem; justify-items: center; }
+.dial { display: block; width: 100%; max-width: 36rem; height: auto; overflow: visible; font-family: var(--sans); }
+/* The dial is drawn by tools/dial.py. From the outside in: the sky band
+   (thick through the night, tapering at dusk and dawn), a quarter-hour
+   track, the hour numerals, and an inner face with two small dials. */
+.dial .bezel { fill: none; stroke: var(--rule); stroke-width: 1; }
+.dial .guide { fill: none; stroke: color-mix(in srgb, var(--rule) 60%, transparent); stroke-width: .8; }
+.dial .sky circle { fill: var(--moon); }
+.dial .rail { fill: none; stroke: var(--rule); stroke-width: .9; }
+.dial .ticks-quarter { fill: none; stroke: var(--dim); stroke-width: 8; stroke-dasharray: .8 14.2535; stroke-dashoffset: .4; }
+.dial .ticks-hour { fill: none; stroke: var(--mist); stroke-width: 16; stroke-dasharray: 1.6 58.6139; stroke-dashoffset: .8; }
+.dial .pearls { fill: none; stroke: var(--dim); stroke-width: 2.2; stroke-linecap: round; stroke-dasharray: 0 11.781; }
+.dial .seconds { display: none; fill: var(--moon); transform-origin: 300px 300px; }
+.dial .rays { fill: none; stroke: color-mix(in srgb, var(--rule) 75%, transparent); stroke-width: 54; stroke-dasharray: .6 5.8141; }
+.dial text { fill: var(--dim); font-size: 20px; font-weight: 500; font-stretch: 82%; }
+.dial .hours text { font-size: 17px; font-variant-numeric: tabular-nums; }
+.dial .hours .cardinal { fill: var(--mist); font-weight: 650; }
+.dial .hours .side { font-size: 15.5px; }
+.dial .sub-face { fill: var(--night-0); stroke: var(--rule); stroke-width: 1; }
+.dial .sub-ticks { fill: none; stroke: var(--dim); stroke-width: 4; }
+.dial .sub-ticks-count { stroke-dasharray: .5 2.9558; }
+.dial .sub-ticks-moon { stroke-dasharray: .7 6.2115; }
+.dial .dial-count { fill: var(--lamp); font-size: 34px; font-weight: 740; font-stretch: 80%; font-variant-numeric: tabular-nums; }
+.dial .sub-label { font-size: 11.5px; }
+.dial .moon-dark { fill: var(--night-2); stroke: var(--rule); stroke-width: .8; }
+.dial .moon-lit { fill: var(--moon); }
+.dial .moon-star { fill: var(--mist); }
+.dial .lead { stroke: var(--dim); stroke-width: 1; }
+.dial .dial-time { fill: var(--moon); font-size: 66px; font-weight: 720; font-stretch: 76%; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+.dial .dial-state { font-weight: 650; }
+.dial .dial-state.is-night { fill: var(--agent); }
+.dial .dial-state.is-day { fill: var(--lamp); }
+.dial .now path { fill: var(--moon); }
+.dial .now-glow { fill: url(#dial-glow); }
+.dial .now-bead { fill: var(--night-0); stroke: var(--moon); stroke-width: 3; }
+.dial .mark { cursor: pointer; }
+.dial .mark .hit { fill: transparent; }
+.dial .mark .dot { stroke: var(--night-0); stroke-width: 3; transform-box: fill-box; transform-origin: center; transition: transform .15s; }
+.dial .mark.by-agent .dot { fill: var(--agent); }
+.dial .mark.by-person .dot { fill: var(--lamp); }
+.dial .mark text { fill: var(--mist); font-variant-numeric: tabular-nums; }
+.dial .mark.is-on .dot { transform: scale(1.55); }
+.dial .mark.is-on text { fill: var(--moon); }
+.legend { display: flex; flex-wrap: wrap; justify-content: center; gap: .4rem 1.4rem; font-size: .875rem; color: var(--dim); }
+.legend > * { display: inline-flex; align-items: center; gap: .45rem; color: inherit; }
+.legend > *::before { content: ""; flex: none; width: .6rem; height: .6rem; border-radius: 50%; background: var(--agent); }
+.legend .k-person::before { background: var(--lamp); }
+.legend .k-now::before { background: none; border: 2px solid var(--moon); }
+.legend .k-wait::before { background: none; border: 2px solid var(--lamp); }
+.legend .k-moon::before { background: linear-gradient(90deg, var(--night-2) 50%, var(--moon) 50%); }
+.legend a { text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: .2em; }
+.legend a:hover { color: var(--moon); }
+@media (prefers-reduced-motion: no-preference) {
+  .dial .sweep { stroke-dasharray: 1570.8; animation: sweep 1.8s cubic-bezier(.3, .1, .2, 1) both; }
+  .dial .seconds { display: inline; animation: orbit 60s linear infinite; }
+  .dial .mark, .nightlog li { animation: arrive .45s ease-out both; animation-delay: calc(.35s + var(--i) * .22s); }
+}
+@keyframes sweep { from { stroke-dashoffset: 1570.8; } }
+@keyframes orbit { to { transform: rotate(360deg); } }
+@keyframes arrive { from { opacity: 0; } }
+
+/* The example night, as a list beside the dial */
+.nightlog { grid-area: log; display: grid; gap: .9rem; }
+.nightlog ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .15rem 1.6rem; }
+.nightlog li, .record li { display: grid; gap: .1rem .7rem; align-items: baseline; }
+.nightlog li { grid-template-columns: auto minmax(0, 1fr); align-content: start; margin-inline: -.7rem; padding: .6rem .7rem; border-radius: 10px; transition: background-color .15s; }
+.nightlog li > div { display: contents; }
+.nightlog li p { grid-column: 1 / -1; }
+.record li { grid-template-columns: 4.6rem minmax(0, 1fr); }
+.nightlog li.is-on { background: color-mix(in srgb, var(--night-2) 75%, transparent); }
+.nightlog time, .record time { font-size: .875rem; font-weight: 600; font-stretch: 82%; color: var(--dim); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.nightlog p, .record p { font-size: .9375rem; line-height: 1.5; color: var(--mist); }
+.who { display: block; font-size: .8125rem; font-weight: 650; color: var(--agent); }
+.by-person .who { color: var(--lamp); }
+.nightlog .by-person p, .record .by-person p { color: var(--moon); }
+
+/* Bands */
+.band { padding-block: clamp(4.5rem, 9vw, 8rem); scroll-margin-top: 4rem; }
+.band-raised { background: var(--night-1); }
+.flow { display: grid; gap: clamp(3rem, 6vw, 5rem); }
+.head { display: grid; gap: 1.4rem; max-width: 58rem; }
+.block { display: grid; gap: 1.5rem; min-width: 0; }
+.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3rem clamp(2rem, 5vw, 4.5rem); align-items: start; }
+.split-wide-left { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+.split-wide-right { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
+
+.takes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.75rem clamp(1.5rem, 4vw, 3.5rem); }
+.pairs { display: grid; gap: 1.3rem; }
+.takes dt, .pairs dt { font-weight: 650; color: var(--moon); }
+.takes dd, .pairs dd { margin-top: .25rem; color: var(--mist); font-size: 1rem; }
+
+/* Exhibit: the morning queue */
+.exhibit {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.25rem);
+  padding: clamp(1.25rem, 3.2vw, 2.75rem);
+  border-radius: 20px;
+  background: var(--night-1);
+  scroll-margin-top: 5rem;
+}
+.exhibit-head { display: grid; gap: .6rem; max-width: 44rem; }
+.exhibit-head p { color: var(--mist); }
+.queue { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 2rem clamp(1.5rem, 3.5vw, 3rem); align-items: start; }
+.cards { display: grid; gap: .9rem; }
+.card {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: 1rem 1.5rem;
+  align-items: start;
+  padding: 1.2rem 1.25rem 1.3rem;
+  border-radius: 12px;
+  background: var(--night-2);
+}
+.card-doc { display: grid; gap: .8rem; justify-items: start; }
+.card-doc h4 { font-size: 1.125rem; font-weight: 680; font-stretch: 94%; line-height: 1.25; }
+.card-doc .fine { color: var(--mist); }
+.card-plan { display: grid; gap: .9rem; justify-items: start; }
+.proposal { display: grid; gap: .45rem; width: 100%; }
+.proposal > div { display: grid; grid-template-columns: 4.4rem minmax(0, 1fr); gap: .6rem; align-items: baseline; }
+.proposal dt { font-size: .8125rem; color: var(--dim); }
+.proposal dd { font-size: .9375rem; line-height: 1.4; color: var(--moon); min-width: 0; overflow-wrap: anywhere; }
+.proposal select { width: 100%; padding: .35rem .5rem; border: 1.5px solid var(--rule); border-radius: 6px; background: var(--night-0); font-size: .9375rem; }
+.card-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.card.is-done { background: color-mix(in srgb, var(--night-2) 55%, var(--night-1)); }
+
+/* Stamps: the office's own way of saying when and who */
+.stamp {
+  display: inline-grid;
+  justify-items: start;
+  width: max-content;
+  max-width: 100%;
+  padding: .36rem .6rem .3rem;
+  border: 2px solid currentColor;
+  border-radius: 4px;
+  color: var(--agent);
+  font: 700 .72rem/1.15 var(--sans);
+  font-stretch: 72%;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  transform: rotate(-2.5deg);
+  filter: url(#ink);
+}
+.stamp b { font-size: 1.05rem; font-weight: 800; letter-spacing: .03em; }
+.stamp-lamp { color: var(--lamp); transform: rotate(2.5deg); }
+@media (prefers-reduced-motion: no-preference) {
+  .approved:not([hidden]) { animation: thud .2s ease-out both; }
+}
+@keyframes thud { from { opacity: 0; transform: rotate(2.5deg) scale(1.7); } }
+
+.record { display: grid; gap: 1rem; justify-items: start; scroll-margin-top: 5rem; }
+.record ol { width: 100%; }
+.record ol { display: grid; }
+.record li { padding: .7rem 0; border-top: 1px solid var(--rule); }
+.record li:last-child { border-bottom: 1px solid var(--rule); }
+.record .by-agent time { color: var(--agent); }
+.record .by-person time { color: var(--lamp); }
+
+.fieldnote { max-width: 50rem; font-size: clamp(1.25rem, .9vw + 1.05rem, 1.7rem); font-weight: 500; font-stretch: 92%; line-height: 1.38; color: var(--moon); }
+
+/* A real sequence, so it is numbered */
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem clamp(1.5rem, 4vw, 3.5rem); counter-reset: step; }
+.steps li { counter-increment: step; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0 1rem; }
+.steps li::before { content: counter(step); grid-row: span 2; font-size: 3.4rem; font-weight: 760; font-stretch: 70%; line-height: .9; color: color-mix(in srgb, var(--agent) 50%, var(--night-0)); }
+.steps h4 { font-size: 1.0625rem; font-weight: 650; }
+.steps p { margin-top: .25rem; color: var(--mist); font-size: 1rem; }
+
+/* Paper: the documents a test starts and ends with */
+.paper {
+  position: relative;
+  display: grid;
+  gap: 1.1rem;
+  padding: clamp(1.4rem, 3.2vw, 2.4rem);
+  border-radius: 3px;
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 1rem/1.55 var(--serif);
+  box-shadow: 0 30px 60px -28px rgb(0 0 0 / .75);
+  scroll-margin-top: 5rem;
+}
+.paper :focus-visible { outline-color: var(--ink); }
+.paper h3 { font: 620 1.6rem/1.18 var(--serif); letter-spacing: -.012em; }
+.paper h4 { font: 650 .9375rem/1.3 var(--serif); margin-bottom: .3rem; }
+.paper .sub { font-size: .9375rem; color: var(--ink-soft); }
+.paper strong { font-weight: 650; }
+.paper code { font-family: var(--code); font-size: .875em; overflow-wrap: anywhere; }
+.paper .stamp { color: var(--ink-blue); }
+.paper .stamp-lamp { color: var(--ink-amber); }
+.clauses { display: grid; counter-reset: clause; }
+.clauses li { counter-increment: clause; display: grid; grid-template-columns: 2.1rem minmax(0, 1fr); gap: .5rem; padding: .8rem 0; border-top: 1px solid color-mix(in srgb, var(--ink) 16%, transparent); }
+.clauses li::before { content: "\00A7" counter(clause); color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.facts { display: flex; flex-wrap: wrap; gap: .5rem 2.5rem; padding-block: .9rem; border-block: 1px solid color-mix(in srgb, var(--ink) 16%, transparent); }
+.facts dt { font-size: .8125rem; color: var(--ink-soft); }
+.facts dd { font-weight: 650; }
+.repro { display: grid; gap: .3rem; padding-left: 1.3rem; list-style: decimal; }
+.stamps { display: flex; flex-wrap: wrap; gap: .9rem 1.4rem; padding-top: .4rem; }
+@media (min-width: 901px) {
+  .tilt-l { transform: rotate(-.7deg); }
+  .tilt-r { transform: rotate(.8deg); }
+}
+
+/* Exhibit: the scope gate */
+.gate { display: grid; gap: 1.3rem; padding: clamp(1.25rem, 3vw, 2.25rem); border-radius: 20px; background: var(--night-0); scroll-margin-top: 5rem; }
+.gate > p { color: var(--mist); }
+.gate code { font-family: var(--code); font-size: .9em; color: var(--moon); }
+.scope-list { display: grid; gap: .5rem; }
+.scope-list > div { display: grid; grid-template-columns: 5rem minmax(0, 1fr); gap: .75rem; align-items: baseline; }
+.scope-list dt { font-size: .875rem; color: var(--dim); }
+.scope-list dd { display: flex; flex-wrap: wrap; gap: .2rem 1rem; color: var(--mist); font-size: .9375rem; }
+.gate form { display: grid; gap: .7rem; }
+.gate label { font-size: .875rem; font-weight: 600; color: var(--mist); }
+.gate-row { display: flex; flex-wrap: wrap; gap: .6rem; }
+.gate input {
+  flex: 1 1 12rem;
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: .5rem .8rem;
+  border: 1.5px solid var(--rule);
+  border-radius: 10px;
+  background: var(--night-1);
+  font: 400 1rem/1.2 var(--code);
+}
+.presets { display: flex; flex-wrap: wrap; gap: .4rem; }
+.presets button { padding: .3rem .65rem; border: 1.5px solid var(--rule); border-radius: 999px; background: none; font: 400 .8125rem/1.3 var(--code); color: var(--mist); cursor: pointer; }
+.presets button:hover { border-color: var(--mist); color: var(--moon); }
+.verdict { display: grid; gap: .2rem; padding: 1rem 1.1rem; border-radius: 12px; background: var(--night-1); overflow-wrap: anywhere; }
+.verdict strong { font-size: 1.25rem; font-weight: 720; font-stretch: 90%; }
+.verdict span { color: var(--mist); font-size: .9375rem; }
+.verdict[data-state="allowed"] strong { color: var(--ok); }
+.verdict[data-state="blocked"] strong { color: var(--stop); }
+
+.gets { display: grid; gap: .85rem; font-size: 1.125rem; line-height: 1.4; color: var(--moon); }
+.gets li { padding-left: 1.5rem; background: radial-gradient(circle at .3rem .75rem, var(--lamp) 0 .22rem, transparent .25rem) no-repeat; }
+
+/* How we work */
+.rules { display: grid; gap: clamp(1.75rem, 3.5vw, 2.5rem); }
+.rules > div { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: .5rem clamp(2rem, 5vw, 4.5rem); align-items: baseline; }
+.rules dt { font-weight: 700; font-stretch: 90%; font-size: clamp(1.4rem, 1.2vw + 1.05rem, 1.9rem); line-height: 1.15; letter-spacing: -.01em; }
+.rules dd { display: grid; gap: .6rem; justify-items: start; color: var(--mist); max-width: 40rem; }
+
+.letter { display: grid; gap: 1.15rem; max-width: 40rem; font-size: clamp(1.0625rem, .4vw + 1rem, 1.2rem); line-height: 1.6; color: var(--mist); }
+.letter p:first-child { color: var(--moon); }
+.letter .sign { color: var(--moon); font-weight: 650; }
+
+/* Dawn, then day */
+.dawn {
+  position: relative;
+  isolation: isolate;
+  height: clamp(11rem, 24vw, 19rem);
+  background: linear-gradient(180deg, var(--night-0) 0%, var(--dawn-1) 24%, var(--dawn-2) 44%, var(--dawn-3) 61%, var(--dawn-4) 75%, var(--dawn-5) 88%, var(--day) 100%);
+}
+.day { background: var(--day); color: var(--ink); }
+.day :focus-visible { outline-color: var(--ink); }
+.day .band { padding-block: clamp(2rem, 4vw, 3.5rem) clamp(4.5rem, 9vw, 7.5rem); }
+.day .lede { color: var(--ink-soft); }
+.email {
+  justify-self: start;
+  font-weight: 740;
+  font-stretch: 86%;
+  font-size: clamp(1.9rem, 4vw + .8rem, 4rem);
+  line-height: 1.1;
+  letter-spacing: -.02em;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: .06em;
+  text-underline-offset: .14em;
+  text-decoration-color: color-mix(in srgb, var(--ink) 35%, transparent);
+  overflow-wrap: anywhere;
+}
+.email:hover { text-decoration-color: var(--ink); }
+.actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+.btn-ink { background: var(--ink); color: var(--day); }
+.btn-ink:hover { background: color-mix(in srgb, var(--ink) 86%, var(--dawn-3)); }
+.btn-ink-quiet { border-color: color-mix(in srgb, var(--ink) 45%, transparent); color: var(--ink); }
+.btn-ink-quiet:hover { border-color: var(--ink); }
+.site-footer { padding-block: 2rem 2.5rem; color: var(--ink-soft); font-size: .875rem; }
+.site-footer .wrap { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .75rem 2rem; }
+.site-footer .wrap::before { content: ""; flex: 0 0 100%; border-top: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); margin-bottom: 1.1rem; }
+.site-footer p { max-width: 34rem; }
+
+@media (max-width: 1080px) {
+  .takes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .card { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 900px) {
+  .hero-grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "copy" "dial" "log"; grid-template-rows: none; }
+  .split, .split-wide-left, .split-wide-right, .queue { grid-template-columns: minmax(0, 1fr); }
+  .rules > div { grid-template-columns: minmax(0, 1fr); }
+  .steps { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  .nightlog ol { grid-template-columns: minmax(0, 1fr); }
+  .takes { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <filter id="ink" x="-4%" y="-12%" width="108%" height="124%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" seed="7" result="grain"/>
+    <feDisplacementMap in="SourceGraphic" in2="grain" scale="1.3" result="rough"/>
+    <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -4 3.3" result="wear"/>
+    <feComposite in="rough" in2="wear" operator="in"/>
+  </filter>
+</svg>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Midnira, back to top">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><g class="orbit"><circle cx="16" cy="17" r="11" fill="none" stroke="currentColor" stroke-width="1.7" stroke-dasharray="59.1 10" stroke-dashoffset="-5" transform="rotate(-90 16 17)"/><circle class="orbit-dot" cx="16" cy="6" r="2.5"/></g></svg>
+      Midnira
+    </a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#operations">AI operations</a>
+      <a href="#pentest">Penetration testing</a>
+      <a href="#method">How we work</a>
+      <a href="#about">About</a>
+      <a class="btn btn-lamp" href="#contact">Get in touch</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" id="top" aria-labelledby="hero-title">
+    <canvas class="stars" data-seed="4127" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <h1 class="poster" id="hero-title">AI agents that work through the night and wait for your sign-off.</h1>
+
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="lede">Midnira builds and runs AI agents for law firms and other paper-heavy businesses, and uses agents to make penetration tests go further. The agents do the reading and the legwork. Nothing is filed, sent or reported until a person has checked it.</p>
+          <div class="hero-actions">
+            <a class="btn btn-lamp" href="#contact">Get in touch</a>
+            <span class="jumps">
+              <a class="textlink" href="#operations">AI operations</a>
+              <a class="textlink" href="#pentest">Penetration testing</a>
+            </span>
+          </div>
+        </div>
+
+        <figure class="dial-wrap">
+          <!-- dial:start (generated by tools/dial.py) -->
+            <svg class="dial" viewBox="-20 0 640 576" role="img" aria-labelledby="dial-title dial-desc">
+              <title id="dial-title">One example night on a 24-hour dial</title>
+              <desc id="dial-desc">Midnight is at the top. Four agent events fall between 11:42 PM and 3:18 AM, and two decisions by people follow at 8:05 and 8:40 AM. A marker shows your local time. Two small dials show how many proposals are waiting for sign-off and the current phase of the moon.</desc>
+              <defs>
+                <mask id="dial-sweep" maskUnits="userSpaceOnUse" x="0" y="0" width="600" height="600"><circle class="sweep" cx="300" cy="300" r="250" fill="none" stroke="#fff" stroke-width="44" transform="rotate(180 300 300)"/></mask>
+                <radialGradient id="dial-glow"><stop offset="0" stop-color="#EEECE4" stop-opacity=".5"/><stop offset="1" stop-color="#EEECE4" stop-opacity="0"/></radialGradient>
+                <linearGradient id="dial-dusk" gradientUnits="userSpaceOnUse" x1="50" y1="300" x2="69" y2="204.3"><stop offset="0" stop-color="#9F7449"/><stop offset=".5" stop-color="#A85674"/><stop offset="1" stop-color="#394272"/></linearGradient>
+                <linearGradient id="dial-dawn" gradientUnits="userSpaceOnUse" x1="547.9" y1="332.6" x2="516.5" y2="425"><stop offset="0" stop-color="#394272"/><stop offset=".5" stop-color="#A85674"/><stop offset="1" stop-color="#9F7449"/></linearGradient>
+              </defs>
+              <circle class="bezel" cx="300" cy="300" r="264"/>
+              <circle class="guide" cx="300" cy="300" r="260"/>
+              <circle class="guide" cx="300" cy="300" r="240"/>
+              <g class="sky" mask="url(#dial-sweep)" fill="none">
+                <path d="M 68.9 204.6 A 250 250 0 0 1 364.7 58.5" stroke="#394272" stroke-width="20"/>
+                <path d="M 364.7 58.5 A 250 250 0 0 1 547.8 332.9" stroke="#394272" stroke-width="20"/>
+                <path d="M 516.6 424.8 A 250 250 0 0 1 50 299.7" stroke="#9F7449" stroke-width="3"/>
+                <path d="M 48.5 300 L 48.5 296.5 L 48.5 292.9 L 48.5 289.4 L 48.4 285.9 L 48.4 282.3 L 48.4 278.8 L 48.4 275.2 L 48.4 271.7 L 48.4 268.1 L 48.5 264.5 L 48.6 260.9 L 48.8 257.3 L 48.9 253.7 L 49.2 250.1 L 49.4 246.5 L 49.8 242.9 L 50.2 239.3 L 50.6 235.7 L 51.2 232.1 L 51.8 228.5 L 52.5 224.9 L 53.2 221.3 L 54.1 217.8 L 55 214.3 L 56.1 210.8 L 57.2 207.3 L 58.4 203.9 L 59.8 200.5 L 78.3 208.2 L 77 211.3 L 75.7 214.4 L 74.3 217.5 L 73 220.6 L 71.7 223.7 L 70.4 226.8 L 69.1 229.9 L 67.8 233.1 L 66.5 236.3 L 65.2 239.4 L 64 242.6 L 62.8 245.9 L 61.6 249.1 L 60.4 252.3 L 59.4 255.6 L 58.3 258.9 L 57.3 262.3 L 56.4 265.6 L 55.5 269 L 54.7 272.4 L 54 275.8 L 53.4 279.2 L 52.8 282.6 L 52.4 286.1 L 52 289.6 L 51.7 293 L 51.6 296.5 L 51.5 300 Z" fill="url(#dial-dusk)"/>
+                <path d="M 557.8 333.9 L 557.2 337.5 L 556.6 341.1 L 555.9 344.7 L 555 348.2 L 554.1 351.8 L 553 355.3 L 551.9 358.7 L 550.7 362.2 L 549.5 365.6 L 548.1 369 L 546.7 372.3 L 545.3 375.7 L 543.7 378.9 L 542.2 382.2 L 540.6 385.4 L 538.9 388.7 L 537.3 391.8 L 535.5 395 L 533.8 398.1 L 532.1 401.2 L 530.3 404.3 L 528.5 407.4 L 526.7 410.5 L 524.9 413.6 L 523.1 416.6 L 521.4 419.7 L 519.6 422.7 L 517.8 425.7 L 515.2 424.2 L 516.9 421.2 L 518.5 418.1 L 520 415 L 521.4 411.8 L 522.7 408.6 L 524 405.3 L 525.1 402 L 526.2 398.7 L 527.2 395.4 L 528.2 392 L 529 388.7 L 529.8 385.3 L 530.6 381.9 L 531.3 378.5 L 531.9 375.1 L 532.5 371.7 L 533.1 368.3 L 533.6 364.9 L 534.1 361.6 L 534.6 358.2 L 535 354.8 L 535.5 351.4 L 535.9 348.1 L 536.3 344.7 L 536.7 341.4 L 537.1 338 L 537.5 334.7 L 537.9 331.3 Z" fill="url(#dial-dawn)"/>
+                <circle cx="332.4" cy="51.2" r="1.3" opacity="0.6"/>
+                <circle cx="370.3" cy="58.7" r="0.5" opacity="0.6"/>
+                <circle cx="448.3" cy="93.3" r="0.5" opacity="0.5"/>
+                <circle cx="104.7" cy="136.6" r="0.9" opacity="0.3"/>
+                <circle cx="556.9" cy="307.5" r="0.9" opacity="0.7"/>
+                <circle cx="145.7" cy="112.6" r="0.8" opacity="0.3"/>
+                <circle cx="161.5" cy="96.6" r="0.5" opacity="0.6"/>
+                <circle cx="324.7" cy="46.1" r="0.7" opacity="0.7"/>
+                <circle cx="365.2" cy="56.1" r="0.7" opacity="0.5"/>
+                <circle cx="556.8" cy="318.5" r="1.1" opacity="0.7"/>
+                <circle cx="239" cy="61.8" r="0.6" opacity="0.3"/>
+                <circle cx="509.2" cy="165.9" r="1.1" opacity="0.5"/>
+                <circle cx="555" cy="290.3" r="0.5" opacity="0.4"/>
+                <circle cx="545.9" cy="257.7" r="1.4" opacity="0.5"/>
+                <circle cx="99.1" cy="148" r="1" opacity="0.5"/>
+                <circle cx="108.6" cy="143.1" r="1.3" opacity="0.8"/>
+                <circle cx="123.7" cy="128.2" r="0.5" opacity="0.3"/>
+                <circle cx="516.9" cy="185.8" r="0.8" opacity="0.6"/>
+                <circle cx="157.6" cy="90.3" r="0.5" opacity="0.7"/>
+                <circle cx="121.1" cy="127.1" r="0.5" opacity="0.5"/>
+                <circle cx="554.6" cy="299.5" r="0.6" opacity="0.8"/>
+                <circle cx="172.1" cy="87.1" r="1.2" opacity="0.7"/>
+                <circle cx="107.1" cy="129.6" r="0.5" opacity="0.5"/>
+                <circle cx="510.7" cy="170.2" r="0.6" opacity="0.3"/>
+                <circle cx="107.1" cy="139.1" r="0.6" opacity="0.7"/>
+                <circle cx="276.5" cy="51.8" r="1.3" opacity="0.6"/>
+                <circle cx="415.4" cy="72.1" r="0.5" opacity="0.4"/>
+                <circle cx="550.8" cy="255.5" r="0.6" opacity="0.4"/>
+                <circle cx="505.1" cy="145.8" r="0.5" opacity="0.9"/>
+                <circle cx="543.8" cy="238.2" r="0.7" opacity="0.4"/>
+                <circle cx="81.3" cy="165.2" r="0.6" opacity="0.7"/>
+                <circle cx="197.8" cy="66.5" r="0.8" opacity="0.5"/>
+                <circle cx="149" cy="96.7" r="0.5" opacity="0.4"/>
+                <circle cx="405.6" cy="67.6" r="0.8" opacity="0.5"/>
+                <circle cx="542.8" cy="263.1" r="0.5" opacity="0.5"/>
+                <circle cx="327" cy="58.1" r="0.5" opacity="0.5"/>
+                <circle cx="409" cy="81.2" r="0.6" opacity="0.8"/>
+                <circle cx="552.3" cy="306.2" r="0.9" opacity="0.7"/>
+                <circle cx="136.8" cy="119.9" r="0.5" opacity="0.8"/>
+                <circle cx="487.8" cy="124.6" r="0.5" opacity="0.7"/>
+                <circle cx="353.5" cy="52.2" r="0.6" opacity="0.9"/>
+                <circle cx="101" cy="147.5" r="1" opacity="0.8"/>
+                <circle cx="501.3" cy="146.6" r="1.1" opacity="0.8"/>
+                <circle cx="262.4" cy="50" r="1.2" opacity="0.8"/>
+              </g>
+              <circle class="rail" cx="300" cy="300" r="234"/>
+              <circle class="rail" cx="300" cy="300" r="226"/>
+              <circle class="ticks-quarter" cx="300" cy="300" r="230"/>
+              <circle class="ticks-hour" cx="300" cy="300" r="230"/>
+              <g class="hours" aria-hidden="true">
+                <text class="cardinal" x="300" y="102" text-anchor="middle">Midnight</text>
+                <text x="352.8" y="109" text-anchor="middle">1</text>
+                <text x="402" y="129.3" text-anchor="middle">2</text>
+                <text x="444.2" y="161.8" text-anchor="middle">3</text>
+                <text x="476.7" y="204" text-anchor="middle">4</text>
+                <text x="497" y="253.2" text-anchor="middle">5</text>
+                <text class="cardinal side" x="501" y="306" text-anchor="middle">6 AM</text>
+                <text x="497" y="358.8" text-anchor="middle">7</text>
+                <text x="476.7" y="408" text-anchor="middle">8</text>
+                <text x="444.2" y="450.2" text-anchor="middle">9</text>
+                <text x="402" y="482.7" text-anchor="middle">10</text>
+                <text x="352.8" y="503" text-anchor="middle">11</text>
+                <text class="cardinal" x="300" y="510" text-anchor="middle">Noon</text>
+                <text x="247.2" y="503" text-anchor="middle">1</text>
+                <text x="198" y="482.7" text-anchor="middle">2</text>
+                <text x="155.8" y="450.2" text-anchor="middle">3</text>
+                <text x="123.3" y="408" text-anchor="middle">4</text>
+                <text x="103" y="358.8" text-anchor="middle">5</text>
+                <text class="cardinal side" x="99" y="306" text-anchor="middle">6 PM</text>
+                <text x="103" y="253.2" text-anchor="middle">7</text>
+                <text x="123.3" y="204" text-anchor="middle">8</text>
+                <text x="155.8" y="161.8" text-anchor="middle">9</text>
+                <text x="198" y="129.3" text-anchor="middle">10</text>
+                <text x="247.2" y="109" text-anchor="middle">11</text>
+              </g>
+              <circle class="pearls" cx="300" cy="300" r="180"/>
+              <circle class="seconds" cx="300" cy="120" r="3.2"/>
+              <circle class="rail" cx="300" cy="300" r="175"/>
+              <circle class="rays" cx="300" cy="300" r="147"/>
+              <g class="sub" transform="translate(300 182)" aria-hidden="true">
+                <circle class="sub-face" r="38"/><circle class="sub-ticks sub-ticks-count" r="33"/>
+                <text class="dial-count" y="7" text-anchor="middle">3</text>
+                <text class="sub-label" y="24" text-anchor="middle">waiting</text>
+              </g>
+              <g class="sub" transform="translate(300 418)" aria-hidden="true">
+                <circle class="sub-face" r="38"/><circle class="sub-ticks sub-ticks-moon" r="33"/>
+                <circle class="moon-star" cx="-25" cy="-11" r=".9"/><circle class="moon-star" cx="24" cy="-15" r="1.1"/><circle class="moon-star" cx="26" cy="12" r=".8"/><circle class="moon-star" cx="-23" cy="16" r="1"/>
+                <circle class="moon-dark" r="19"/><path class="moon-lit" d="M 0 -19 A 19 19 0 0 1 0 19 Z"/>
+              </g>
+              <g aria-hidden="true">
+                <text class="dial-label" x="300" y="258" text-anchor="middle">Your time</text>
+                <text class="dial-time" x="300" y="322" text-anchor="middle">12:00 AM</text>
+                <text class="dial-state is-night" x="300" y="356" text-anchor="middle">After hours</text>
+              </g>
+              <g class="now" display="none" aria-hidden="true">
+                <path d="M 295.5 139 L 304.5 139 L 300 128 Z" opacity=".7"/><path d="M 294 79 L 306 79 L 300 61 Z"/>
+                <circle class="now-glow" cx="300" cy="50" r="22"/><circle class="now-bead" cx="300" cy="50" r="8"/>
+              </g>
+              <g class="mark by-agent" style="--i:0" aria-hidden="true"><circle class="hit" cx="280.4" cy="50.8" r="20"/><line class="lead" x1="279.4" y1="38.8" x2="278.7" y2="29.8"/><circle class="dot" cx="280.4" cy="50.8" r="7.5"/><text x="273.3" y="21.9" text-anchor="end">11:42 PM</text></g>
+              <g class="mark by-agent" style="--i:1" aria-hidden="true"><circle class="hit" cx="372" cy="60.6" r="20"/><line class="lead" x1="375.5" y1="49.1" x2="378.1" y2="40.5"/><circle class="dot" cx="372" cy="60.6" r="7.5"/><text x="384.8" y="33.1">1:07 AM</text></g>
+              <g class="mark by-agent" style="--i:2" aria-hidden="true"><circle class="hit" cx="452.2" cy="101.7" r="20"/><line class="lead" x1="459.5" y1="92.1" x2="465" y2="85"/><circle class="dot" cx="452.2" cy="101.7" r="7.5"/><text x="473.6" y="79.9">2:30 AM</text></g>
+              <g class="mark by-agent" style="--i:3" aria-hidden="true"><circle class="hit" cx="490.1" cy="137.6" r="20"/><line class="lead" x1="499.2" y1="129.8" x2="506.1" y2="124"/><circle class="dot" cx="490.1" cy="137.6" r="7.5"/><text x="515.6" y="120.9">3:18 AM</text></g>
+              <g class="mark by-person" style="--i:4" aria-hidden="true"><circle class="hit" cx="513.7" cy="429.7" r="20"/><line class="lead" x1="524" y1="435.9" x2="531.7" y2="440.6"/><circle class="dot" cx="513.7" cy="429.7" r="7.5"/><text x="541.8" y="452.8">8:05 AM</text></g>
+              <g class="mark by-person" style="--i:5" aria-hidden="true"><circle class="hit" cx="491.5" cy="460.7" r="20"/><line class="lead" x1="500.7" y1="468.4" x2="507.6" y2="474.2"/><circle class="dot" cx="491.5" cy="460.7" r="7.5"/><text x="517.2" y="487.9">8:40 AM</text></g>
+            </svg>
+            <!-- dial:end -->
+          <figcaption class="legend"><span>Agent</span><span class="k-person">Person</span><span class="k-now">Your local time</span><a class="k-wait" id="queue-count" href="#queue">3 waiting for sign-off</a><span class="k-moon" id="moon-name">Moon phase</span></figcaption>
+        </figure>
+
+        <div class="nightlog">
+          <h2 class="heading" id="log-title">One night, as an example</h2>
+          <ol aria-labelledby="log-title">
+            <li class="by-agent" style="--i:0"><time datetime="23:42">11:42 PM</time><div><span class="who">Operations agent</span><p>A 14-page fax arrives. The agent splits it into separate documents and proposes a folder for each.</p></div></li>
+            <li class="by-agent" style="--i:1"><time datetime="01:07">1:07 AM</time><div><span class="who">Operations agent</span><p>A court notice lands in the inbox. The agent reads the hearing date and drafts a calendar entry.</p></div></li>
+            <li class="by-agent" style="--i:2"><time datetime="02:30">2:30 AM</time><div><span class="who">Testing agent</span><p>The test window opens. Every target is checked against the signed authorization.</p></div></li>
+            <li class="by-agent" style="--i:3"><time datetime="03:18">3:18 AM</time><div><span class="who">Testing agent</span><p>An invoice endpoint returns another customer's record. The agent flags it for the operator.</p></div></li>
+            <li class="by-person" style="--i:4"><time datetime="08:05">8:05 AM</time><div><span class="who">Staff</span><p>The filings and the calendar entry are approved. One folder is corrected first.</p></div></li>
+            <li class="by-person" style="--i:5"><time datetime="08:40">8:40 AM</time><div><span class="who">Operator</span><p>The finding is reproduced by hand, rated high and written up.</p></div></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="operations" aria-labelledby="operations-title">
+    <div class="wrap flow">
+      <div class="head">
+        <h2 class="headline" id="operations-title">We build the agents, then we stay to run them.</h2>
+        <p class="lede">We work with law firms and other paper-heavy businesses, where the day's work arrives as mail, faxes, scans and forms. Most automation projects end at the demo. We design agents around the way your team already works, connect them to the systems you already use, and then operate, monitor and tune them as a managed service.</p>
+      </div>
+
+      <div class="exhibit" id="queue">
+        <div class="exhibit-head">
+          <h3 class="heading">The morning queue</h3>
+          <p>This is the part your staff see. The agents did the reading overnight, and each proposal waits for a person. Approve one, or change the folder first.</p>
+          <p class="fine">An example with invented documents. In practice these arrive as one-click approvals in Slack or email.</p>
+        </div>
+        <div class="queue">
+          <ul class="cards" aria-label="Proposals waiting for approval">
+            <li class="card" data-doc="the medical records" data-folder="Matter 1874 › Medical records">
+              <div class="card-doc">
+                <span class="stamp">Received by fax <b>11:42 PM</b></span>
+                <h4>Medical records, 12 pages</h4>
+              </div>
+              <div class="card-plan">
+                <dl class="proposal">
+                  <div><dt>File to</dt><dd><span class="folder">Matter 1874 › Medical records</span>
+                    <select id="folder-records" aria-label="Folder for the medical records" hidden>
+                      <option>Matter 1874 › Medical records</option>
+                      <option>Matter 1874 › Correspondence</option>
+                      <option>Unmatched mail</option>
+                    </select></dd></div>
+                  <div><dt>Notify</dt><dd>Case manager</dd></div>
+                </dl>
+                <div class="card-actions">
+                  <button class="btn btn-lamp btn-small" type="button" data-act="approve">Approve</button>
+                  <button class="btn btn-quiet btn-small" type="button" data-act="change">Change folder</button>
+                </div>
+                <span class="stamp stamp-lamp approved" hidden>Approved by you <b></b></span>
+              </div>
+            </li>
+            <li class="card" data-doc="the cover letter" data-folder="Matter 1847 › Correspondence">
+              <div class="card-doc">
+                <span class="stamp">Received by fax <b>11:42 PM</b></span>
+                <h4>Cover letter, 2 pages</h4>
+                <p class="fine">Agent's note: the letter gives a client name but no matter number, so this folder is the closest match on the name.</p>
+              </div>
+              <div class="card-plan">
+                <dl class="proposal">
+                  <div><dt>File to</dt><dd><span class="folder">Matter 1847 › Correspondence</span>
+                    <select id="folder-letter" aria-label="Folder for the cover letter" hidden>
+                      <option>Matter 1847 › Correspondence</option>
+                      <option>Matter 1874 › Correspondence</option>
+                      <option>Unmatched mail</option>
+                    </select></dd></div>
+                  <div><dt>Notify</dt><dd>Case manager</dd></div>
+                </dl>
+                <div class="card-actions">
+                  <button class="btn btn-lamp btn-small" type="button" data-act="approve">Approve</button>
+                  <button class="btn btn-quiet btn-small" type="button" data-act="change">Change folder</button>
+                </div>
+                <span class="stamp stamp-lamp approved" hidden>Approved by you <b></b></span>
+              </div>
+            </li>
+            <li class="card" data-doc="the notice of hearing" data-folder="Matter 2291 › Court notices">
+              <div class="card-doc">
+                <span class="stamp">Received by email <b>1:07 AM</b></span>
+                <h4>Notice of hearing</h4>
+              </div>
+              <div class="card-plan">
+                <dl class="proposal">
+                  <div><dt>File to</dt><dd><span class="folder">Matter 2291 › Court notices</span>
+                    <select id="folder-notice" aria-label="Folder for the notice of hearing" hidden>
+                      <option>Matter 2291 › Court notices</option>
+                      <option>Matter 2291 › Pleadings</option>
+                      <option>Unmatched mail</option>
+                    </select></dd></div>
+                  <div><dt>Calendar</dt><dd>Hearing, Thursday at 9:30 AM</dd></div>
+                  <div><dt>Notify</dt><dd>Assigned attorney</dd></div>
+                </dl>
+                <div class="card-actions">
+                  <button class="btn btn-lamp btn-small" type="button" data-act="approve">Approve</button>
+                  <button class="btn btn-quiet btn-small" type="button" data-act="change">Change folder</button>
+                </div>
+                <span class="stamp stamp-lamp approved" hidden>Approved by you <b></b></span>
+              </div>
+            </li>
+          </ul>
+
+          <div class="record" id="record">
+            <h3 class="heading" id="record-title">The record</h3>
+            <ol aria-labelledby="record-title" aria-live="polite">
+              <li class="by-agent"><time datetime="23:42">11:42 PM</time><p>Fax received, 14 pages. Split into two documents.</p></li>
+              <li class="by-agent"><time datetime="23:44">11:44 PM</time><p>A folder is proposed for each document.</p></li>
+              <li class="by-agent"><time datetime="01:07">1:07 AM</time><p>Notice of hearing received by email. Hearing date read and a calendar entry drafted.</p></li>
+            </ol>
+            <p class="fine">Each row keeps the source document, the agent's proposal and the name of the person who approved it.</p>
+            <button class="textlink" type="button" id="queue-reset" hidden>Reset the example</button>
+          </div>
+        </div>
+      </div>
+
+      <p class="fieldnote">For a law firm, the agents read incoming mail, faxes and court notices, propose where each document belongs and who needs to see it, and then wait. Staff approve each filing with a click. Nothing is filed or sent without that approval.</p>
+
+      <div class="block">
+        <h3 class="heading">What the agents take on</h3>
+        <dl class="takes">
+          <div><dt>Intake and triage</dt><dd>Email, fax, scans and portal notices are read as they arrive and sorted by what they are and who needs them.</dd></div>
+          <div><dt>Document filing</dt><dd>Each document is named, classified and proposed for the right folder in your system of record.</dd></div>
+          <div><dt>Deadlines and routing</dt><dd>Dates are pulled from notices and letters, sent to the responsible person and proposed for the calendar.</dd></div>
+          <div><dt>Approvals where you work</dt><dd>Proposed actions show up as one-click approvals in Slack or email, so staff stay in control without a new app to learn.</dd></div>
+          <div><dt>Monitoring</dt><dd>Every scheduled job is watched. A missed run raises an alert instead of going unnoticed.</dd></div>
+          <div><dt>Tuning to your procedures</dt><dd>Corrections from your staff are turned into rules, so the same mistake is not repeated.</dd></div>
+        </dl>
+      </div>
+
+      <div class="block">
+        <h3 class="heading">How an engagement runs</h3>
+        <ol class="steps">
+          <li><h4>Map</h4><p>We document one workflow as it runs today, including the written procedures and the unwritten ones.</p></li>
+          <li><h4>Shadow</h4><p>The agents run beside your staff and propose without acting. We compare their proposals with what your people did until the two agree.</p></li>
+          <li><h4>Operate</h4><p>Approvals go live. We run the agents, watch them, report on them and keep tuning as your procedures change.</p></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band-raised" id="pentest" aria-labelledby="pentest-title">
+    <div class="wrap flow">
+      <div class="head">
+        <h2 class="headline" id="pentest-title">Penetration tests that cover more ground, led by an operator who has done it by hand.</h2>
+        <p class="lede">Every penetration test is limited by hours. In an agentic test, AI agents take on the wide, repetitive work of mapping the attack surface, trying the known paths and re-checking fixes. That leaves the operator's time for the chained, context-dependent attacks that tools miss. Every finding in your report has been reproduced by a person.</p>
+      </div>
+
+      <div class="block">
+        <h3 class="heading">What we test</h3>
+        <dl class="takes">
+          <div><dt>Web applications and APIs</dt><dd>Authentication, authorization, business logic and the paths between them.</dd></div>
+          <div><dt>Networks</dt><dd>External exposure and internal movement, from the first foothold to what an attacker could reach.</dd></div>
+          <div><dt>Cloud and identity</dt><dd>Misconfigurations, excess permissions and trust relationships across cloud accounts and identity providers.</dd></div>
+        </dl>
+      </div>
+
+      <div class="split">
+        <article class="paper tilt-l" aria-labelledby="roe-title">
+          <div>
+            <h3 id="roe-title">Rules of engagement</h3>
+            <p class="sub">The terms every test runs under</p>
+          </div>
+          <ol class="clauses">
+            <li><p><strong>Written authorization comes first.</strong> No testing starts without a signed scope, a test window and emergency contacts.</p></li>
+            <li><p><strong>Agents stay in scope.</strong> Targets are checked against the authorization before an agent touches them, and every action is logged.</p></li>
+            <li><p><strong>A person validates every finding.</strong> Nothing goes into your report on an agent's word alone.</p></li>
+            <li><p><strong>Nothing disruptive without consent.</strong> Techniques that could affect availability or data need your approval in advance.</p></li>
+            <li><p><strong>AI use is disclosed.</strong> Your agreement names the AI tooling involved and explains how your data is handled.</p></li>
+          </ol>
+        </article>
+
+        <div class="gate" id="scope">
+          <h3 class="heading">The scope gate</h3>
+          <p>This is rule 2 at work. Before a testing agent contacts anything, code checks the target against the signed scope. Try one.</p>
+          <dl class="scope-list" aria-label="Example scope">
+            <div><dt>In scope</dt><dd><code>app.example.com</code><code>api.example.com</code><code>10.20.0.0/24</code></dd></div>
+            <div><dt>Excluded</dt><dd><span><code>10.20.0.53</code>, the production database</span></dd></div>
+          </dl>
+          <form id="gate-form" novalidate>
+            <label for="gate-input">Target</label>
+            <div class="gate-row">
+              <input id="gate-input" type="text" value="10.20.0.53" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false">
+              <button class="btn btn-quiet" type="submit">Check target</button>
+            </div>
+            <div class="presets" role="group" aria-label="Example targets">
+              <button type="button" data-target="api.example.com">api.example.com</button>
+              <button type="button" data-target="10.20.0.14">10.20.0.14</button>
+              <button type="button" data-target="10.20.0.53">10.20.0.53</button>
+              <button type="button" data-target="10.20.1.9">10.20.1.9</button>
+              <button type="button" data-target="mail.example.com">mail.example.com</button>
+            </div>
+          </form>
+          <p class="verdict" id="gate-verdict" role="status" data-state="blocked"><strong>Blocked.</strong><span>10.20.0.53 is excluded by name in the authorization. The agent stops and the attempt is logged.</span></p>
+          <p class="fine">An example scope. The check runs in your browser and nothing is sent anywhere.</p>
+        </div>
+      </div>
+
+      <div class="split split-wide-left">
+        <article class="paper tilt-r" id="finding" aria-labelledby="finding-title">
+          <p class="sub">A sample finding, as it appears in a report</p>
+          <h3 id="finding-title">Invoice API returns other customers' records</h3>
+          <dl class="facts">
+            <div><dt>Severity</dt><dd>High</dd></div>
+            <div><dt>Where</dt><dd><code>GET /api/invoices/{id}</code></dd></div>
+          </dl>
+          <div>
+            <h4>What happened</h4>
+            <p>Changing the invoice number in a request returned an invoice that belongs to a different customer. The server checks that the caller is signed in. It does not check that the invoice is theirs.</p>
+          </div>
+          <div>
+            <h4>Steps to reproduce</h4>
+            <ol class="repro">
+              <li>Sign in as test customer A and open any invoice.</li>
+              <li>Note the invoice number in the request, then request the next number up.</li>
+              <li>The response contains customer B's name, address and line items.</li>
+            </ol>
+          </div>
+          <div>
+            <h4>Fix</h4>
+            <p>Check ownership on the server for every invoice request, and add a test that fails if one customer can read another's invoice.</p>
+          </div>
+          <div class="stamps">
+            <span class="stamp">Flagged by agent <b>3:18 AM</b></span>
+            <span class="stamp stamp-lamp">Reproduced by operator <b>8:40 AM</b></span>
+          </div>
+        </article>
+
+        <div class="flow">
+          <div class="block">
+            <h3 class="heading">What you receive</h3>
+            <ul class="gets">
+              <li>A report with reproducible steps and severity ratings</li>
+              <li>A prioritized fix list</li>
+              <li>A readout call with your team</li>
+              <li>A retest of the fixes</li>
+            </ul>
+          </div>
+          <div class="block">
+            <h3 class="heading">Ways to engage</h3>
+            <dl class="pairs">
+              <div><dt>Agentic penetration test</dt><dd>Agent-assisted and operator-led. More coverage inside the same test window, with every agent action logged.</dd></div>
+              <div><dt>Manual penetration test</dt><dd>Testing by hand, without AI tooling, for environments where it is not permitted.</dd></div>
+              <div><dt>Retests and recurring tests</dt><dd>Fixes are re-checked after remediation. Teams that ship often can book testing on a regular cadence.</dd></div>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="method" aria-labelledby="method-title">
+    <div class="wrap flow">
+      <div class="head">
+        <h2 class="headline" id="method-title">One practice, pointed in two directions.</h2>
+        <p class="lede">Running agents in production shows you how they fail. Breaking into systems shows you what failure costs. Midnira's operations work is built by a penetration tester, and its testing uses agents built by someone who runs them in production. The same three rules apply to both.</p>
+      </div>
+      <dl class="rules">
+        <div><dt>People approve what matters</dt><dd><p>Agents propose and people decide. The approval step is part of the design and cannot be switched off for convenience.</p><a class="textlink" href="#queue">Try the morning queue</a></dd></div>
+        <div><dt>Code decides what must be right</dt><dd><p>Where there is one correct answer, such as a deadline, a filing rule or a scope boundary, it is enforced by code. Models are used where judgment helps.</p><a class="textlink" href="#scope">Try the scope gate</a></dd></div>
+        <div><dt>Everything leaves a record</dt><dd><p>Each action is logged with its inputs and the person who approved it, so any result can be traced back to its source.</p><a class="textlink" href="#record">See the record</a></dd></div>
+      </dl>
+      <div class="block" id="data">
+        <h3 class="heading">How your data is handled</h3>
+        <dl class="takes">
+          <div><dt>The agents run on Claude</dt><dd>Claude is the AI model made by Anthropic. It is the model behind the agents we build and run.</dd></div>
+          <div><dt>Your data does not train AI models</dt><dd>The documents, messages and test results that pass through the agents are not used for model training.</dd></div>
+          <div><dt>Ask us the rest</dt><dd>Where the agents run, who can read the logs and how long data is kept depend on the engagement. We answer in writing before any work starts.</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="about" aria-labelledby="about-title">
+    <div class="wrap split split-wide-right">
+      <h2 class="headline" id="about-title">A small practice, on purpose.</h2>
+      <div class="letter">
+        <p>I'm Derek Fish. I started Midnira in 2026, and the person who scopes your work is the person who does it.</p>
+        <p>I have spent eight years in security, across penetration testing, red team work and managed detection and response. I have also built and operated fleets of AI agents in production, where they handle a company's daily operations under human supervision.</p>
+        <p>I have earned eight GIAC certifications, including GXPN (exploit development), GPEN (penetration testing), GCIH (incident handling) and GCED (enterprise defense).</p>
+        <p class="sign">Derek Fish, founder</p>
+        <p><a class="textlink" href="https://www.linkedin.com/in/derek-fish/" rel="me noopener">Derek on LinkedIn</a></p>
+      </div>
+    </div>
+  </section>
+
+  <div class="dawn" aria-hidden="true"><canvas class="stars" data-seed="77" data-reach=".42"></canvas></div>
+
+  <div class="day">
+    <section class="band" id="contact" aria-labelledby="contact-title">
+      <div class="wrap block">
+        <div class="head">
+          <h2 class="headline" id="contact-title">Tell us what you want handled, or what you want tested.</h2>
+          <p class="lede">Send a few lines about the work. A person reads every message and replies.</p>
+        </div>
+        <a class="email" href="mailto:info@midnira.ai">info@midnira.ai</a>
+        <div class="actions">
+          <a class="btn btn-ink" href="mailto:info@midnira.ai?subject=AI%20operations">Email about AI operations</a>
+          <a class="btn btn-ink-quiet" href="mailto:info@midnira.ai?subject=Penetration%20test">Email about a penetration test</a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p>&copy; 2026 Midnira LLC</p>
+        <p>Penetration testing is performed only with written authorization from the system owner.</p>
+      </div>
+    </footer>
+  </div>
+</main>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function clock(d) {
+    var h = d.getHours(), m = d.getMinutes();
+    return ((h % 12) || 12) + ':' + (m < 10 ? '0' : '') + m + ' ' + (h < 12 ? 'AM' : 'PM');
+  }
+
+  /* Sky. A small seeded generator keeps the stars the same on every visit. */
+  function generator(seed) {
+    return function () {
+      seed = (seed + 0x6D2B79F5) | 0;
+      var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  var css = getComputedStyle(root);
+  var moon = css.getPropertyValue('--moon').trim();
+  var tints = [moon, moon, moon, moon, css.getPropertyValue('--agent').trim(), css.getPropertyValue('--lamp').trim()];
+  var skies = document.querySelectorAll('canvas.stars');
+
+  function paint(canvas) {
+    if (!canvas.getContext) return;
+    var box = canvas.parentNode, ctx = canvas.getContext('2d');
+    var w = box.clientWidth, h = box.clientHeight;
+    var reach = (parseFloat(canvas.getAttribute('data-reach')) || 1) * h;   // how far down the stars go
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    var rand = generator(parseInt(canvas.getAttribute('data-seed'), 10) || 1);
+    var count = Math.min(460, Math.round(w * reach / 3000));
+    for (var i = 0; i < count; i++) {
+      var x = rand() * w;
+      var y = Math.pow(rand(), 1.5) * reach;
+      var r = 0.35 + Math.pow(rand(), 3) * 1.15;
+      ctx.globalAlpha = (0.22 + rand() * 0.6) * (1 - 0.85 * y / reach);
+      ctx.fillStyle = tints[Math.floor(rand() * tints.length)];
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+  function paintAll() { for (var i = 0; i < skies.length; i++) paint(skies[i]); }
+  paintAll();
+  var resizing;
+  window.addEventListener('resize', function () { clearTimeout(resizing); resizing = setTimeout(paintAll, 150); });
+
+  var hero = document.querySelector('.hero');
+  if (hero) {
+    var spark = generator(905);
+    for (var s = 0; s < 6; s++) {
+      var star = document.createElement('span');
+      star.className = 'twinkle';
+      star.style.left = (spark() * 100).toFixed(2) + '%';
+      star.style.top = (spark() * 40).toFixed(2) + '%';
+      star.style.setProperty('--d', (4 + spark() * 4).toFixed(1) + 's');
+      star.style.setProperty('--o', (-spark() * 8).toFixed(1) + 's');
+      hero.appendChild(star);
+    }
+  }
+
+  /* The dial: show the visitor's own time, and pair each mark with its entry. */
+  var dial = document.querySelector('.dial');
+  if (dial) {
+    var hand = dial.querySelector('.now');
+    var timeText = dial.querySelector('.dial-time');
+    var stateText = dial.querySelector('.dial-state');
+    var tick = function () {
+      var d = new Date(), hours = d.getHours() + d.getMinutes() / 60;
+      var open = hours >= 8 && hours < 18;
+      hand.setAttribute('transform', 'rotate(' + (hours / 24 * 360).toFixed(2) + ' 300 300)');
+      hand.removeAttribute('display');
+      timeText.textContent = clock(d);
+      stateText.textContent = open ? 'Office hours' : 'After hours';
+      stateText.setAttribute('class', 'dial-state ' + (open ? 'is-day' : 'is-night'));
+    };
+    tick();
+    setInterval(tick, 20000);
+
+    /* A small bead runs round the inner ring once a minute, in step with the real second. */
+    var bead = dial.querySelector('.seconds');
+    if (bead) {
+      var started = new Date();
+      bead.style.animationDelay = '-' + (started.getSeconds() + started.getMilliseconds() / 1000).toFixed(2) + 's';
+    }
+
+    /* The lower small dial shows the moon's real phase, from the mean
+       length of a lunar month counted from a known new moon. */
+    var lit = dial.querySelector('.moon-lit');
+    var moonName = document.getElementById('moon-name');
+    if (lit) {
+      var month = 29.530588853;
+      var age = ((Date.now() - Date.UTC(2000, 0, 6, 18, 14)) / 86400000) % month;
+      if (age < 0) age += month;
+      var phase = age / month, bulge = Math.cos(phase * 2 * Math.PI), waxing = phase < 0.5, R = 19;
+      var limb = waxing ? 1 : 0, edge = (bulge > 0) === waxing ? 0 : 1;
+      lit.setAttribute('d', 'M 0 ' + (-R) + ' A ' + R + ' ' + R + ' 0 0 ' + limb + ' 0 ' + R +
+        ' A ' + (R * Math.abs(bulge)).toFixed(2) + ' ' + R + ' 0 0 ' + edge + ' 0 ' + (-R) + ' Z');
+      var names = [[0.03, 'New moon'], [0.22, 'Waxing crescent moon'], [0.28, 'First quarter moon'], [0.47, 'Waxing gibbous moon'],
+        [0.53, 'Full moon'], [0.72, 'Waning gibbous moon'], [0.78, 'Last quarter moon'], [0.97, 'Waning crescent moon'], [2, 'New moon']];
+      for (var q = 0; q < names.length; q++) {
+        if (phase < names[q][0]) { if (moonName) moonName.textContent = names[q][1]; break; }
+      }
+    }
+
+    var marks = dial.querySelectorAll('.mark');
+    var rows = document.querySelectorAll('.nightlog li');
+    var pick = function (index) {
+      for (var i = 0; i < marks.length; i++) {
+        marks[i].classList.toggle('is-on', i === index);
+        if (rows[i]) rows[i].classList.toggle('is-on', i === index);
+      }
+    };
+    var pair = function (el, index) {
+      el.addEventListener('click', function () { pick(index); });
+      el.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') pick(index); });
+    };
+    for (var k = 0; k < marks.length; k++) {
+      pair(marks[k], k);
+      if (rows[k]) pair(rows[k], k);
+    }
+  }
+
+  /* The mark in the header keeps time with the page: midnight at the top,
+     morning by the end. */
+  var orbit = document.querySelector('.orbit');
+  if (orbit && !calm) {
+    var queued = false;
+    var turn = function () {
+      queued = false;
+      var max = root.scrollHeight - window.innerHeight;
+      var part = max > 0 ? Math.min(1, Math.max(0, window.pageYOffset / max)) : 0;
+      orbit.style.transform = 'rotate(' + (part * 240).toFixed(1) + 'deg)';
+    };
+    window.addEventListener('scroll', function () {
+      if (!queued) { queued = true; window.requestAnimationFrame(turn); }
+    }, { passive: true });
+    turn();
+  }
+
+  /* The morning queue. */
+  var cards = document.querySelector('.cards');
+  var record = document.querySelector('.record ol');
+  var reset = document.getElementById('queue-reset');
+  if (cards && record && reset) {
+    /* The upper small dial on the hero counts what is still waiting here. */
+    var countDial = document.querySelector('.dial-count');
+    var countNote = document.getElementById('queue-count');
+    var recount = function () {
+      var left = cards.querySelectorAll('.card:not(.is-done)').length;
+      if (countDial) countDial.textContent = left;
+      if (countNote) countNote.textContent = left === 0 ? 'Nothing waiting for sign-off' : left + ' waiting for sign-off';
+    };
+    cards.addEventListener('click', function (e) {
+      var btn = e.target.closest ? e.target.closest('button[data-act]') : null;
+      if (!btn) return;
+      var card = btn.closest('.card');
+      var shown = card.querySelector('.folder');
+      var choice = card.querySelector('select');
+      if (btn.getAttribute('data-act') === 'change') {
+        shown.hidden = true;
+        choice.hidden = false;
+        btn.hidden = true;
+        choice.focus();
+        return;
+      }
+      var proposed = card.getAttribute('data-folder');
+      var folder = choice.hidden ? proposed : choice.value;
+      var now = clock(new Date());
+      shown.textContent = folder;
+      shown.hidden = false;
+      choice.hidden = true;
+      card.classList.add('is-done');
+      card.querySelector('.card-actions').hidden = true;
+      var stamp = card.querySelector('.approved');
+      stamp.querySelector('b').textContent = now;
+      stamp.hidden = false;
+
+      var row = document.createElement('li');
+      row.className = 'by-person added';
+      var when = document.createElement('time');
+      when.textContent = now;
+      var what = document.createElement('p');
+      what.textContent = folder === proposed
+        ? 'You approved filing ' + card.getAttribute('data-doc') + ' to ' + folder + '.'
+        : 'You changed the folder to ' + folder + ' and approved. The correction is kept as a rule for next time.';
+      row.appendChild(when);
+      row.appendChild(what);
+      record.appendChild(row);
+      reset.hidden = false;
+      recount();
+    });
+
+    reset.addEventListener('click', function () {
+      var all = cards.querySelectorAll('.card');
+      for (var i = 0; i < all.length; i++) {
+        var card = all[i], proposed = card.getAttribute('data-folder');
+        var shown = card.querySelector('.folder'), choice = card.querySelector('select');
+        shown.textContent = proposed;
+        shown.hidden = false;
+        choice.value = proposed;
+        choice.hidden = true;
+        card.classList.remove('is-done');
+        card.querySelector('.card-actions').hidden = false;
+        card.querySelector('[data-act="change"]').hidden = false;
+        card.querySelector('.approved').hidden = true;
+      }
+      var added = record.querySelectorAll('.added');
+      for (var j = 0; j < added.length; j++) record.removeChild(added[j]);
+      reset.hidden = true;
+      recount();
+    });
+  }
+
+  /* The scope gate. Anything it cannot read is blocked. */
+  var form = document.getElementById('gate-form');
+  var entry = document.getElementById('gate-input');
+  var verdict = document.getElementById('gate-verdict');
+  if (form && entry && verdict) {
+    var ip4 = function (text) {
+      var m = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(text);
+      if (!m) return null;
+      var n = 0;
+      for (var i = 1; i <= 4; i++) {
+        var octet = parseInt(m[i], 10);
+        if (octet > 255) return null;
+        n = n * 256 + octet;
+      }
+      return n;
+    };
+    var dotted = function (n) {
+      return [Math.floor(n / 16777216), Math.floor(n / 65536) % 256, Math.floor(n / 256) % 256, n % 256].join('.');
+    };
+    var hosts = ['app.example.com', 'api.example.com'];
+    var netBase = ip4('10.20.0.0'), netSize = 256;
+    var excluded = ip4('10.20.0.53');
+    var hostname = /^(?=.{1,253}$)[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$/;
+
+    var say = function (state, text) {
+      verdict.setAttribute('data-state', state);
+      verdict.querySelector('strong').textContent = state === 'allowed' ? 'Allowed.' : 'Blocked.';
+      verdict.querySelector('span').textContent = text;
+    };
+    var check = function (raw) {
+      var target = String(raw).trim().toLowerCase()
+        .replace(/^[a-z][a-z0-9+.-]*:\/\//, '')
+        .replace(/[\/?#].*$/, '')
+        .replace(/:\d+$/, '')
+        .replace(/\.$/, '');
+      if (!target) return say('blocked', 'Nothing was entered. Type a hostname or an IPv4 address, such as api.example.com or 10.20.0.14.');
+      var address = ip4(target);
+      if (address !== null) {
+        var shown = dotted(address);
+        if (address === excluded) return say('blocked', shown + ' is excluded by name in the authorization. The agent stops and the attempt is logged.');
+        if (address >= netBase && address < netBase + netSize) return say('allowed', shown + ' is inside 10.20.0.0/24, which the signed scope lists.');
+        return say('blocked', shown + ' is outside the signed scope. The agent never contacts it.');
+      }
+      if (hostname.test(target)) {
+        if (hosts.indexOf(target) !== -1) return say('allowed', target + ' is listed in the signed scope.');
+        if (/(^|\.)example\.com$/.test(target)) return say('blocked', target + ' is not listed. A related name is not assumed to be in scope.');
+        return say('blocked', target + ' is not in the signed scope. The agent never contacts it.');
+      }
+      return say('blocked', 'That is not a hostname or an IPv4 address. Anything the gate cannot read is blocked.');
+    };
+
+    form.addEventListener('submit', function (e) { e.preventDefault(); check(entry.value); });
+    form.addEventListener('click', function (e) {
+      var preset = e.target.closest ? e.target.closest('button[data-target]') : null;
+      if (!preset) return;
+      entry.value = preset.getAttribute('data-target');
+      check(entry.value);
+    });
+  }
+})();
+</script>
+</body>
+</html>
