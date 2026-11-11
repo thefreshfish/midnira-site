@@ -457,6 +457,8 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
 .letter { display: grid; gap: 1.15rem; max-width: 40rem; font-size: clamp(1.0625rem, .4vw + 1rem, 1.2rem); line-height: 1.6; color: var(--mist); }
 .letter p:first-child { color: var(--moon); }
 .letter .sign { color: var(--moon); font-weight: 650; }
+.about-head { display: grid; gap: clamp(1.75rem, 3vw, 2.5rem); justify-items: start; }
+.portrait { display: block; width: min(100%, 19rem); height: auto; aspect-ratio: 4 / 5; object-fit: cover; border: 1px solid var(--rule); border-radius: 12px; background: var(--night-2); }
 
 /* Dawn, then day */
 .dawn {
@@ -503,6 +505,7 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
   .split, .split-wide-left, .split-wide-right, .queue { grid-template-columns: minmax(0, 1fr); }
   .rules > div { grid-template-columns: minmax(0, 1fr); }
   .steps { grid-template-columns: minmax(0, 1fr); }
+  .portrait { width: min(100%, 14rem); }
 }
 @media (max-width: 640px) {
   .nightlog ol { grid-template-columns: minmax(0, 1fr); }
@@ -957,7 +960,10 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
 
   <section class="band" id="about" aria-labelledby="about-title">
     <div class="wrap split split-wide-right">
-      <h2 class="headline" id="about-title">A small practice, on purpose.</h2>
+      <div class="about-head">
+        <h2 class="headline" id="about-title">A small practice, on purpose.</h2>
+        <img class="portrait" src="derek-fish.jpg" width="640" height="800" alt="Derek Fish, founder of Midnira" loading="lazy" decoding="async">
+      </div>
       <div class="letter">
         <p>I'm Derek Fish. I started Midnira in 2026, and the person who scopes your work is the person who does it.</p>
         <p>I have spent eight years in security, across penetration testing, red team work and managed detection and response. I have also built and operated fleets of AI agents in production, where they handle a company's daily operations under human supervision.</p>
