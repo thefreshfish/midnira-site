@@ -495,6 +495,7 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
 .site-footer .wrap { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .75rem 2rem; }
 .site-footer .wrap::before { content: ""; flex: 0 0 100%; border-top: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); margin-bottom: 1.1rem; }
 .site-footer p { max-width: 34rem; }
+.site-footer .footnote { flex: 0 0 100%; max-width: none; }
 
 @media (max-width: 1080px) {
   .takes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -995,6 +996,7 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
       <div class="wrap">
         <p>&copy; 2026 Midnira LLC</p>
         <p>Penetration testing is performed only with written authorization from the system owner.</p>
+        <p class="footnote">This site counts visits with Cloudflare Web Analytics, which sets no cookies.</p>
       </div>
     </footer>
   </div>
@@ -1281,5 +1283,6 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
   }
 })();
 </script>
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "62c4091366b54e349874377e16bdb1ef"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
