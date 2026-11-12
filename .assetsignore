@@ -1,4 +1,7 @@
-# Files in the repository that are not part of the website. Cloudflare skips them.
+# Files in the build checkout that are not part of the website. Cloudflare skips them.
+.git
+.wrangler
+node_modules
 .nojekyll
 CNAME
 tools/
