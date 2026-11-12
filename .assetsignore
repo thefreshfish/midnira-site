@@ -1,0 +1,5 @@
+# Files in the repository that are not part of the website. Cloudflare skips them.
+.nojekyll
+CNAME
+tools/
+wrangler.jsonc

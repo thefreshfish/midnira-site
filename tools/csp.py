@@ -1,16 +1,18 @@
-"""Keep the page's content security policy in step with its inline style and script.
+"""Keep the site's content security policy in step with its inline style and script.
 
-The policy is a <meta http-equiv="Content-Security-Policy"> tag near the top of
-index.html. It allows the page's one inline <style> and one inline <script> by
-their SHA-256 hashes, so any edit to either block changes its hash and the tag has
-to be rewritten, or the browser will refuse the block.
+The policy is in two places: a <meta http-equiv="Content-Security-Policy"> tag
+near the top of index.html, and the Content-Security-Policy line in _headers,
+which Cloudflare sends as a response header. It allows the page's one inline
+<style> and one inline <script> by their SHA-256 hashes, so any edit to either
+block changes its hash and both places have to be rewritten, or the browser will
+refuse the block.
 
 Run from the site folder:
 
-  python3 tools/csp.py          rewrite the tag with the current hashes
-  python3 tools/csp.py --check  exit 1 if the tag is missing or out of date
+  python3 tools/csp.py          rewrite both with the current hashes
+  python3 tools/csp.py --check  exit 1 if either is missing or out of date
 
-A meta tag cannot carry frame-ancestors or HSTS; those need real response headers.
+A meta tag cannot carry frame-ancestors, so only the _headers line has it.
 """
 import base64
 import hashlib
@@ -18,7 +20,9 @@ import re
 import sys
 
 PAGE = "index.html"
+HEADERS = "_headers"
 TAG = re.compile(r'<meta http-equiv="Content-Security-Policy" content="[^"]*">\n')
+LINE = re.compile(r"^([ \t]+Content-Security-Policy:).*$", re.M)
 ANCHOR = '<meta name="viewport"'
 
 
@@ -54,11 +58,16 @@ def policy(html):
 
 def main():
     html = open(PAGE, encoding="utf-8").read()
-    tag = '<meta http-equiv="Content-Security-Policy" content="%s">\n' % policy(html)
+    rules = open(HEADERS, encoding="utf-8").read()
+    value = policy(html)
+    tag = '<meta http-equiv="Content-Security-Policy" content="%s">\n' % value
+    if len(LINE.findall(rules)) != 1:
+        sys.exit("csp: expected one Content-Security-Policy line in %s" % HEADERS)
+    new_rules = LINE.sub(lambda m: "%s %s; frame-ancestors 'none'" % (m.group(1), value), rules)
     current = TAG.search(html)
     if "--check" in sys.argv:
-        if not current or current.group(0) != tag:
-            sys.exit("csp: the tag is missing or out of date; run python3 tools/csp.py")
+        if not current or current.group(0) != tag or new_rules != rules:
+            sys.exit("csp: the tag or the _headers line is missing or out of date; run python3 tools/csp.py")
         print("csp: up to date")
         return
     if current:
@@ -68,7 +77,8 @@ def main():
         at = html.index("\n", at) + 1
         html = html[:at] + tag + html[at:]
     open(PAGE, "w", encoding="utf-8").write(html)
-    print("csp: tag written")
+    open(HEADERS, "w", encoding="utf-8").write(new_rules)
+    print("csp: tag and _headers line written")
 
 
 if __name__ == "__main__":

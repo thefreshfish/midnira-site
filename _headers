@@ -1,0 +1,10 @@
+# Response headers for every file on the site. Cloudflare applies this file and
+# does not serve it; GitHub Pages does not apply it.
+# The Content-Security-Policy line is written by tools/csp.py. Do not edit it by hand.
+/*
+  Content-Security-Policy: default-src 'none'; script-src 'sha256-kEuc4SQ1FJ0Jv2sSaTsVGbYGVxrnnVrvRjkGefYGL+g=' https://static.cloudflareinsights.com; style-src 'sha256-ntacYa7uUuBMFpxJQfqHVd3NOhzNc/L0c/PQJh0+jKg=' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; connect-src https://cloudflareinsights.com; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  Strict-Transport-Security: max-age=31536000
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), geolocation=(), microphone=(), payment=(), usb=()
