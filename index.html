@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-kEuc4SQ1FJ0Jv2sSaTsVGbYGVxrnnVrvRjkGefYGL+g=' https://static.cloudflareinsights.com; style-src 'sha256-ntacYa7uUuBMFpxJQfqHVd3NOhzNc/L0c/PQJh0+jKg=' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; connect-src https://cloudflareinsights.com; base-uri 'none'; form-action 'none'">
 <title>Midnira | AI operations and penetration testing</title>
 <meta name="description" content="Midnira builds and runs supervised AI agents for law firms and other paper-heavy businesses, and performs agent-assisted penetration tests led by a certified operator.">
 <link rel="canonical" href="https://midnira.ai/">
@@ -85,6 +86,7 @@ a { color: inherit; }
 button, input, select { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--lamp); outline-offset: 3px; border-radius: 3px; }
 
+.svg-defs { position: absolute; }
 .wrap {
   width: 100%;
   max-width: 78rem;
@@ -270,7 +272,9 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
 @media (prefers-reduced-motion: no-preference) {
   .dial .sweep { stroke-dasharray: 1570.8; animation: sweep 1.8s cubic-bezier(.3, .1, .2, 1) both; }
   .dial .seconds { display: inline; animation: orbit 60s linear infinite; }
-  .dial .mark, .nightlog li { animation: arrive .45s ease-out both; animation-delay: calc(.35s + var(--i) * .22s); }
+  .dial .mark, .nightlog li { animation: arrive .45s ease-out both; animation-delay: calc(.35s + var(--i, 0) * .22s); }
+  /* arrival order; set here, not in style attributes, so the content security policy can forbid inline styles */
+  [data-i="1"] { --i: 1; } [data-i="2"] { --i: 2; } [data-i="3"] { --i: 3; } [data-i="4"] { --i: 4; } [data-i="5"] { --i: 5; }
 }
 @keyframes sweep { from { stroke-dashoffset: 1570.8; } }
 @keyframes orbit { to { transform: rotate(360deg); } }
@@ -517,7 +521,7 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
 <body>
 <a class="skip" href="#main">Skip to content</a>
 
-<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<svg class="svg-defs" width="0" height="0" aria-hidden="true" focusable="false">
   <filter id="ink" x="-4%" y="-12%" width="108%" height="124%" color-interpolation-filters="sRGB">
     <feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" seed="7" result="grain"/>
     <feDisplacementMap in="SourceGraphic" in2="grain" scale="1.3" result="rough"/>
@@ -678,12 +682,12 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
                 <path d="M 295.5 139 L 304.5 139 L 300 128 Z" opacity=".7"/><path d="M 294 79 L 306 79 L 300 61 Z"/>
                 <circle class="now-glow" cx="300" cy="50" r="22"/><circle class="now-bead" cx="300" cy="50" r="8"/>
               </g>
-              <g class="mark by-agent" style="--i:0" aria-hidden="true"><circle class="hit" cx="280.4" cy="50.8" r="20"/><line class="lead" x1="279.4" y1="38.8" x2="278.7" y2="29.8"/><circle class="dot" cx="280.4" cy="50.8" r="7.5"/><text x="273.3" y="21.9" text-anchor="end">11:42 PM</text></g>
-              <g class="mark by-agent" style="--i:1" aria-hidden="true"><circle class="hit" cx="372" cy="60.6" r="20"/><line class="lead" x1="375.5" y1="49.1" x2="378.1" y2="40.5"/><circle class="dot" cx="372" cy="60.6" r="7.5"/><text x="384.8" y="33.1">1:07 AM</text></g>
-              <g class="mark by-agent" style="--i:2" aria-hidden="true"><circle class="hit" cx="452.2" cy="101.7" r="20"/><line class="lead" x1="459.5" y1="92.1" x2="465" y2="85"/><circle class="dot" cx="452.2" cy="101.7" r="7.5"/><text x="473.6" y="79.9">2:30 AM</text></g>
-              <g class="mark by-agent" style="--i:3" aria-hidden="true"><circle class="hit" cx="490.1" cy="137.6" r="20"/><line class="lead" x1="499.2" y1="129.8" x2="506.1" y2="124"/><circle class="dot" cx="490.1" cy="137.6" r="7.5"/><text x="515.6" y="120.9">3:18 AM</text></g>
-              <g class="mark by-person" style="--i:4" aria-hidden="true"><circle class="hit" cx="513.7" cy="429.7" r="20"/><line class="lead" x1="524" y1="435.9" x2="531.7" y2="440.6"/><circle class="dot" cx="513.7" cy="429.7" r="7.5"/><text x="541.8" y="452.8">8:05 AM</text></g>
-              <g class="mark by-person" style="--i:5" aria-hidden="true"><circle class="hit" cx="491.5" cy="460.7" r="20"/><line class="lead" x1="500.7" y1="468.4" x2="507.6" y2="474.2"/><circle class="dot" cx="491.5" cy="460.7" r="7.5"/><text x="517.2" y="487.9">8:40 AM</text></g>
+              <g class="mark by-agent" data-i="0" aria-hidden="true"><circle class="hit" cx="280.4" cy="50.8" r="20"/><line class="lead" x1="279.4" y1="38.8" x2="278.7" y2="29.8"/><circle class="dot" cx="280.4" cy="50.8" r="7.5"/><text x="273.3" y="21.9" text-anchor="end">11:42 PM</text></g>
+              <g class="mark by-agent" data-i="1" aria-hidden="true"><circle class="hit" cx="372" cy="60.6" r="20"/><line class="lead" x1="375.5" y1="49.1" x2="378.1" y2="40.5"/><circle class="dot" cx="372" cy="60.6" r="7.5"/><text x="384.8" y="33.1">1:07 AM</text></g>
+              <g class="mark by-agent" data-i="2" aria-hidden="true"><circle class="hit" cx="452.2" cy="101.7" r="20"/><line class="lead" x1="459.5" y1="92.1" x2="465" y2="85"/><circle class="dot" cx="452.2" cy="101.7" r="7.5"/><text x="473.6" y="79.9">2:30 AM</text></g>
+              <g class="mark by-agent" data-i="3" aria-hidden="true"><circle class="hit" cx="490.1" cy="137.6" r="20"/><line class="lead" x1="499.2" y1="129.8" x2="506.1" y2="124"/><circle class="dot" cx="490.1" cy="137.6" r="7.5"/><text x="515.6" y="120.9">3:18 AM</text></g>
+              <g class="mark by-person" data-i="4" aria-hidden="true"><circle class="hit" cx="513.7" cy="429.7" r="20"/><line class="lead" x1="524" y1="435.9" x2="531.7" y2="440.6"/><circle class="dot" cx="513.7" cy="429.7" r="7.5"/><text x="541.8" y="452.8">8:05 AM</text></g>
+              <g class="mark by-person" data-i="5" aria-hidden="true"><circle class="hit" cx="491.5" cy="460.7" r="20"/><line class="lead" x1="500.7" y1="468.4" x2="507.6" y2="474.2"/><circle class="dot" cx="491.5" cy="460.7" r="7.5"/><text x="517.2" y="487.9">8:40 AM</text></g>
             </svg>
             <!-- dial:end -->
           <figcaption class="legend"><span>Agent</span><span class="k-person">Person</span><span class="k-now">Your local time</span><a class="k-wait" id="queue-count" href="#queue">3 waiting for sign-off</a><span class="k-moon" id="moon-name">Moon phase</span></figcaption>
@@ -692,12 +696,12 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
         <div class="nightlog">
           <h2 class="heading" id="log-title">One night, as an example</h2>
           <ol aria-labelledby="log-title">
-            <li class="by-agent" style="--i:0"><time datetime="23:42">11:42 PM</time><div><span class="who">Operations agent</span><p>A 14-page fax arrives. The agent splits it into separate documents and proposes a folder for each.</p></div></li>
-            <li class="by-agent" style="--i:1"><time datetime="01:07">1:07 AM</time><div><span class="who">Operations agent</span><p>A court notice lands in the inbox. The agent reads the hearing date and drafts a calendar entry.</p></div></li>
-            <li class="by-agent" style="--i:2"><time datetime="02:30">2:30 AM</time><div><span class="who">Testing agent</span><p>The test window opens. Every target is checked against the signed authorization.</p></div></li>
-            <li class="by-agent" style="--i:3"><time datetime="03:18">3:18 AM</time><div><span class="who">Testing agent</span><p>An invoice endpoint returns another customer's record. The agent flags it for the operator.</p></div></li>
-            <li class="by-person" style="--i:4"><time datetime="08:05">8:05 AM</time><div><span class="who">Staff</span><p>The filings and the calendar entry are approved. One folder is corrected first.</p></div></li>
-            <li class="by-person" style="--i:5"><time datetime="08:40">8:40 AM</time><div><span class="who">Operator</span><p>The finding is reproduced by hand, rated high and written up.</p></div></li>
+            <li class="by-agent" data-i="0"><time datetime="23:42">11:42 PM</time><div><span class="who">Operations agent</span><p>A 14-page fax arrives. The agent splits it into separate documents and proposes a folder for each.</p></div></li>
+            <li class="by-agent" data-i="1"><time datetime="01:07">1:07 AM</time><div><span class="who">Operations agent</span><p>A court notice lands in the inbox. The agent reads the hearing date and drafts a calendar entry.</p></div></li>
+            <li class="by-agent" data-i="2"><time datetime="02:30">2:30 AM</time><div><span class="who">Testing agent</span><p>The test window opens. Every target is checked against the signed authorization.</p></div></li>
+            <li class="by-agent" data-i="3"><time datetime="03:18">3:18 AM</time><div><span class="who">Testing agent</span><p>An invoice endpoint returns another customer's record. The agent flags it for the operator.</p></div></li>
+            <li class="by-person" data-i="4"><time datetime="08:05">8:05 AM</time><div><span class="who">Staff</span><p>The filings and the calendar entry are approved. One folder is corrected first.</p></div></li>
+            <li class="by-person" data-i="5"><time datetime="08:40">8:40 AM</time><div><span class="who">Operator</span><p>The finding is reproduced by hand, rated high and written up.</p></div></li>
           </ol>
         </div>
       </div>

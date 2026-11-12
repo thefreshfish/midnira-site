@@ -115,7 +115,7 @@ def marks():
         ty += 6 - 8 * c if c > 0 else 6 - 6 * c
         label = "%d:%02d %s" % (hh % 12 or 12, mm, "AM" if hh < 12 else "PM")
         out.append(
-            '<g class="mark by-%s" style="--i:%d" aria-hidden="true">'
+            '<g class="mark by-%s" data-i="%d" aria-hidden="true">'
             '<circle class="hit" cx="%s" cy="%s" r="20"/>'
             '<line class="lead" x1="%s" y1="%s" x2="%s" y2="%s"/>'
             '<circle class="dot" cx="%s" cy="%s" r="7.5"/>'
