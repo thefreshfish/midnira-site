@@ -2,7 +2,5 @@
 .git
 .wrangler
 node_modules
-.nojekyll
-CNAME
 tools/
 wrangler.jsonc
