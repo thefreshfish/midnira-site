@@ -492,7 +492,62 @@
             </ul>
           </div>
         </div>
-        <p class="blurb">Built into the tooling: a scope check in code before any contact, which blocks whatever it cannot verify; rate limits; no denial-of-service tools; and a log of every agent action.</p>
+      </div>
+
+      <div class="split split-code" id="harness">
+        <div class="block">
+          <h3 class="heading">A harness we built ourselves</h3>
+          <p class="blurb">The testing agent runs inside a harness that Midnira wrote. Off-the-shelf autonomous testing tools let the model drive. For work on a client's live systems, we wanted the limits in code that we own and can show you. The model chooses what to look at next. Code decides whether it may.</p>
+          <dl class="pairs">
+            <div><dt>Scope</dt><dd>Each target is checked against the signed authorization at the moment of contact. A name is looked up again every time, and the tool is given the approved addresses, not the name. What cannot be verified is refused.</dd></div>
+            <div><dt>Options</dt><dd>Every tool has a short list of options it may use and speed caps the agent cannot lift. Anything else is refused.</dd></div>
+            <div><dt>Pace</dt><dd>One rate budget covers every worker, so agents running in parallel cannot crowd a host.</dd></div>
+            <div><dt>Record</dt><dd>Every decision goes into the log, the refusals too, with the exact command that ran.</dd></div>
+          </dl>
+          <p class="blurb">No exploitation or denial-of-service tools are wired into it. Its tests run without touching a network, and each stage of the build gets a security review before the next begins.</p>
+        </div>
+        <!-- harness:start -->
+        <div class="source">
+          <p class="source-head"><code>scope.py</code><span>The check every address goes through</span></p>
+          <pre tabindex="0" aria-label="Source code of the scope gate's check for an address"><code><span class="cm"># ---- direct IP target -------------------------------------------------</span>
+<span class="kw">if</span> kind == "ip":
+    ip = _canon_ip(host)
+    <span class="kw">if</span> ip <span class="kw">is</span> None:
+        <span class="kw">return</span> ScopeDecision(<span class="no">DENY</span>, target, kind, host, [],
+                             "unparseable IP target")
+    chost = str(ip)   <span class="cm"># canonical form, used as the rate-limit key too</span>
+    <span class="kw">for</span> net <span class="kw">in</span> scope.exclude_cidrs:
+        <span class="kw">if</span> ip <span class="kw">in</span> net:
+            <span class="kw">return</span> ScopeDecision(<span class="no">DENY</span>, target, kind, chost, [chost],
+                                 f"ip in exclude_cidr {net}", str(net))
+    <span class="cm"># a special/non-public IP is in scope only if explicitly included</span>
+    <span class="kw">if</span> _is_special(ip) <span class="kw">and</span> <span class="kw">not</span> any(ip <span class="kw">in</span> net <span class="kw">for</span> net <span class="kw">in</span> scope.include_cidrs):
+        <span class="kw">return</span> ScopeDecision(<span class="no">DENY</span>, target, kind, chost, [chost],
+                             "special/non-public IP not covered by an "
+                             "explicit include_cidr")
+    <span class="kw">for</span> net <span class="kw">in</span> scope.include_cidrs:
+        <span class="kw">if</span> ip <span class="kw">in</span> net:
+            <span class="kw">return</span> ScopeDecision(<span class="ok">ALLOW</span>, target, kind, chost, [chost],
+                                 f"ip in include_cidr {net}", str(net),
+                                 scan_ips=[chost])
+    <span class="kw">return</span> ScopeDecision(<span class="no">DENY</span>, target, kind, chost, [chost],
+                         "ip not within any include_cidr")</code></pre>
+          <p class="source-head"><code>recon-run</code><span>What the agent gets back</span></p>
+          <pre class="term" aria-label="Output of three runs of the harness"><code><span class="cmd">$ recon-run nmap 10.20.0.14 --dry-run -- -sV -p 443</span>
+<span class="ok">[DRY-RUN]</span> nmap 10.20.0.14 :: dry run (not executed)
+        resolved: 10.20.0.14
+        argv: nmap -sT -T2 --max-rate 100 --host-timeout 15m -sV -p 443 10.20.0.14
+
+<span class="cmd">$ recon-run nmap 10.20.0.53 -- -sV</span>
+<span class="no">[REFUSED]</span> nmap 10.20.0.53 :: scope: ip in exclude_cidr 10.20.0.53/32
+        resolved: 10.20.0.53
+
+<span class="cmd">$ recon-run nmap 10.20.0.14 -- --script vuln</span>
+<span class="no">[REFUSED]</span> nmap 10.20.0.14 :: args: flag '--script' is blocked: NSE scripts are not permitted in the recon tier (flag for manual follow-up)
+        resolved: 10.20.0.14</code></pre>
+          <p class="fine">The code is copied from the harness as written. The output is the harness's own, run against the example scope above.</p>
+        </div>
+        <!-- harness:end -->
       </div>
 
       <div class="split split-wide-left">
