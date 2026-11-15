@@ -1,84 +1,93 @@
-"""Keep the site's content security policy in step with its inline style and script.
+"""Keep the site's content security policy in step with its pages.
 
-The policy is in two places: a <meta http-equiv="Content-Security-Policy"> tag
-near the top of index.html, and the Content-Security-Policy line in _headers,
-which Cloudflare sends as a response header. It allows the page's one inline
-<style> and one inline <script> by their SHA-256 hashes, so any edit to either
-block changes its hash and both places have to be rewritten, or the browser will
-refuse the block.
+Every page loads its styles from site.css and its script from site.js, so the
+policy allows 'self' and needs no hashes. It is in two places: a
+<meta http-equiv="Content-Security-Policy"> tag near the top of each page, and
+the Content-Security-Policy line in _headers, which Cloudflare sends as a
+response header. The meta tag keeps the policy in force wherever a page is
+opened without the header.
 
-Run from the site folder:
+Run from the site folder after adding a page or changing markup:
 
-  python3 tools/csp.py          rewrite both with the current hashes
-  python3 tools/csp.py --check  exit 1 if either is missing or out of date
+  python3 tools/csp.py          write the tag into every page and the _headers line
+  python3 tools/csp.py --check  exit 1 if a page breaks the policy or either copy is out of date
 
-A meta tag cannot carry frame-ancestors, so only the _headers line has it.
+The policy would block an inline <style> or <script>, a style="" attribute and
+an inline event handler, so the tool refuses to run if a page has one. A meta
+tag cannot carry frame-ancestors, so only the _headers line has it.
 """
-import base64
-import hashlib
+import glob
 import re
 import sys
 
-PAGE = "index.html"
 HEADERS = "_headers"
 TAG = re.compile(r'<meta http-equiv="Content-Security-Policy" content="[^"]*">\n')
 LINE = re.compile(r"^([ \t]+Content-Security-Policy:).*$", re.M)
 ANCHOR = '<meta name="viewport"'
+POLICY = "; ".join([
+    "default-src 'none'",
+    "script-src 'self' https://static.cloudflareinsights.com",
+    "style-src 'self' https://fonts.googleapis.com",
+    "font-src https://fonts.gstatic.com",
+    "img-src 'self'",
+    "connect-src https://cloudflareinsights.com",
+    "base-uri 'none'",
+    "form-action 'none'",
+])
 
 
-def sha(text):
-    return "'sha256-%s'" % base64.b64encode(hashlib.sha256(text.encode("utf-8")).digest()).decode()
-
-
-def one(pattern, html, what):
-    found = re.findall(pattern, html, re.S)
-    if len(found) != 1:
-        sys.exit("csp: expected one %s, found %d" % (what, len(found)))
-    return found[0]
-
-
-def policy(html):
-    style = one(r"<style>(.*?)</style>", html, "inline <style>")
-    script = one(r"<script>(.*?)</script>", html, "inline <script>")
-    if re.search(r'\sstyle="', html):
-        sys.exit("csp: a style attribute is in the markup; the policy would block it")
-    if re.search(r'\son[a-z]+="', html):
-        sys.exit("csp: an inline event handler is in the markup; the policy would block it")
-    return "; ".join([
-        "default-src 'none'",
-        "script-src %s https://static.cloudflareinsights.com" % sha(script),
-        "style-src %s https://fonts.googleapis.com" % sha(style),
-        "font-src https://fonts.gstatic.com",
-        "img-src 'self'",
-        "connect-src https://cloudflareinsights.com",
-        "base-uri 'none'",
-        "form-action 'none'",
-    ])
+def problems(html):
+    found = []
+    if re.search(r"<style[\s>]", html):
+        found.append("an inline <style> block")
+    for attrs, body in re.findall(r"<script\b([^>]*)>(.*?)</script>", html, re.S):
+        if "src=" not in attrs or body.strip():
+            found.append("an inline <script>")
+    for tag in re.findall(r"<[a-zA-Z][^>]*>", html):
+        if re.search(r"\sstyle\s*=", tag):
+            found.append("a style attribute")
+        if re.search(r"\son[a-z]+\s*=", tag):
+            found.append("an inline event handler")
+    return sorted(set(found))
 
 
 def main():
-    html = open(PAGE, encoding="utf-8").read()
+    pages = sorted(glob.glob("*.html"))
+    if not pages:
+        sys.exit("csp: no pages found; run from the site folder")
+    tag = '<meta http-equiv="Content-Security-Policy" content="%s">\n' % POLICY
+    check = "--check" in sys.argv
+    stale = []
+    for page in pages:
+        html = open(page, encoding="utf-8").read()
+        bad = problems(html)
+        if bad:
+            sys.exit("csp: %s has %s; the policy would block it" % (page, ", ".join(bad)))
+        current = TAG.search(html)
+        if check:
+            if not current or current.group(0) != tag:
+                stale.append(page)
+            continue
+        if current:
+            html = html[:current.start()] + tag + html[current.end():]
+        else:
+            at = html.index(ANCHOR)
+            at = html.index("\n", at) + 1
+            html = html[:at] + tag + html[at:]
+        open(page, "w", encoding="utf-8").write(html)
     rules = open(HEADERS, encoding="utf-8").read()
-    value = policy(html)
-    tag = '<meta http-equiv="Content-Security-Policy" content="%s">\n' % value
     if len(LINE.findall(rules)) != 1:
         sys.exit("csp: expected one Content-Security-Policy line in %s" % HEADERS)
-    new_rules = LINE.sub(lambda m: "%s %s; frame-ancestors 'none'" % (m.group(1), value), rules)
-    current = TAG.search(html)
-    if "--check" in sys.argv:
-        if not current or current.group(0) != tag or new_rules != rules:
-            sys.exit("csp: the tag or the _headers line is missing or out of date; run python3 tools/csp.py")
-        print("csp: up to date")
+    new_rules = LINE.sub(lambda m: "%s %s; frame-ancestors 'none'" % (m.group(1), POLICY), rules)
+    if check:
+        if new_rules != rules:
+            stale.append(HEADERS)
+        if stale:
+            sys.exit("csp: out of date in %s; run python3 tools/csp.py" % ", ".join(stale))
+        print("csp: up to date (%s)" % ", ".join(pages))
         return
-    if current:
-        html = html[:current.start()] + tag + html[current.end():]
-    else:
-        at = html.index(ANCHOR)
-        at = html.index("\n", at) + 1
-        html = html[:at] + tag + html[at:]
-    open(PAGE, "w", encoding="utf-8").write(html)
     open(HEADERS, "w", encoding="utf-8").write(new_rules)
-    print("csp: tag and _headers line written")
+    print("csp: tag written to %s and the _headers line" % ", ".join(pages))
 
 
 if __name__ == "__main__":

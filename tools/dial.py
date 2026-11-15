@@ -6,8 +6,13 @@ Run from the repository root:  python3 tools/dial.py
 It rewrites the block between the "dial:start" and "dial:end" comments.
 Geometry is in SVG units around a centre of (300, 300). Midnight is at the
 top and the hours run clockwise, once round in 24 hours. Colours that the
-page can theme are set by class in index.html; only the dusk and dawn taper
+page can theme are set by class in site.css; only the dusk and dawn taper
 is coloured here, because each step has its own width and colour.
+
+Each practice has a lane inside the sky band: AI operations on the outside,
+penetration testing on the inside. A lane runs from that practice's first
+event of the night to its sign-off, and its events sit on it. The log beside
+the dial has one column per practice; a mark and its row share a data-i.
 """
 import math
 import pathlib
@@ -15,10 +20,11 @@ import random
 import re
 
 C = 300
-BAND = 250          # the sky band, where the events sit
-EVENTS = [          # (hour, minute, who) for the example night
-    (23, 42, "agent"), (1, 7, "agent"), (2, 30, "agent"), (3, 18, "agent"),
-    (8, 5, "person"), (8, 40, "person"),
+BAND = 250          # the sky band
+LANES = {"ops": 255, "test": 245}   # the radius of each practice's lane in the band
+EVENTS = [          # (hour, minute, who, practice) for the example night, in order
+    (23, 42, "agent", "ops"), (1, 7, "agent", "ops"), (2, 30, "agent", "test"), (3, 18, "agent", "test"),
+    (8, 5, "person", "ops"), (8, 40, "person", "test"),
 ]
 NIGHT = (0x39, 0x42, 0x72)
 ROSE = (0xA8, 0x56, 0x74)
@@ -36,11 +42,11 @@ def n(v):
     return ("%.1f" % v).rstrip("0").rstrip(".")
 
 
-def arc(h0, h1, attrs=""):
-    x0, y0 = pt(h0, BAND)
-    x1, y1 = pt(h1, BAND)
+def arc(h0, h1, attrs="", r=BAND):
+    x0, y0 = pt(h0, r)
+    x1, y1 = pt(h1, r)
     large = 1 if (h1 - h0) % 24 > 12 else 0
-    return '<path d="M %s %s A %d %d 0 %d 1 %s %s"%s/>' % (n(x0), n(y0), BAND, BAND, large, n(x1), n(y1), attrs)
+    return '<path d="M %s %s A %d %d 0 %d 1 %s %s"%s/>' % (n(x0), n(y0), r, r, large, n(x1), n(y1), attrs)
 
 
 def hexa(rgb):
@@ -101,13 +107,22 @@ def hours():
     return out
 
 
+def lanes():
+    """One arc per practice, from its first event of the night to its sign-off."""
+    out = []
+    for name, r in LANES.items():
+        when = [hh + mm / 60 for hh, mm, _, practice in EVENTS if practice == name]
+        out.append(arc(when[0], when[-1], ' class="lane of-%s" pathLength="1"' % name, r))
+    return out
+
+
 def marks():
     out = []
-    for i, (hh, mm, who) in enumerate(EVENTS):
+    for i, (hh, mm, who, practice) in enumerate(EVENTS):
         h = hh + mm / 60
         a = math.radians(h / 24 * 360)
         c, s = math.cos(a), math.sin(a)
-        x, y = pt(h, BAND)
+        x, y = pt(h, LANES[practice])
         l0, l1 = pt(h, 262), pt(h, 271)
         tx, ty = pt(h, 277)
         anchor = ' text-anchor="end"' if s < 0 else ""
@@ -115,12 +130,12 @@ def marks():
         ty += 6 - 8 * c if c > 0 else 6 - 6 * c
         label = "%d:%02d %s" % (hh % 12 or 12, mm, "AM" if hh < 12 else "PM")
         out.append(
-            '<g class="mark by-%s" data-i="%d" aria-hidden="true">'
+            '<g class="mark by-%s of-%s" data-i="%d" aria-hidden="true">'
             '<circle class="hit" cx="%s" cy="%s" r="20"/>'
             '<line class="lead" x1="%s" y1="%s" x2="%s" y2="%s"/>'
-            '<circle class="dot" cx="%s" cy="%s" r="7.5"/>'
+            '<circle class="dot" cx="%s" cy="%s" r="6.5"/>'
             '<text x="%s" y="%s"%s>%s</text></g>'
-            % (who, i, n(x), n(y), n(l0[0]), n(l0[1]), n(l1[0]), n(l1[1]), n(x), n(y), n(tx), n(ty), anchor, label)
+            % (who, practice, i, n(x), n(y), n(l0[0]), n(l0[1]), n(l1[0]), n(l1[1]), n(x), n(y), n(tx), n(ty), anchor, label)
         )
     return out
 
@@ -130,7 +145,7 @@ def build():
     rows = [
         '<svg class="dial" viewBox="-20 0 640 576" role="img" aria-labelledby="dial-title dial-desc">',
         '  <title id="dial-title">One example night on a 24-hour dial</title>',
-        '  <desc id="dial-desc">Midnight is at the top. Four agent events fall between 11:42 PM and 3:18 AM, and two decisions by people follow at 8:05 and 8:40 AM. A marker shows your local time. Two small dials show how many proposals are waiting for sign-off and the current phase of the moon.</desc>',
+        '  <desc id="dial-desc">Midnight is at the top. An outer lane shows AI operations, from a fax at 11:42 PM to staff approval at 8:05 AM. An inner lane shows a penetration test, from the test window opening at 2:30 AM to the operator reproducing a finding at 8:40 AM. A marker shows your local time. Two small dials show how many proposals are waiting for sign-off and the current phase of the moon.</desc>',
         "  <defs>",
         '    <mask id="dial-sweep" maskUnits="userSpaceOnUse" x="0" y="0" width="600" height="600"><circle class="sweep" cx="300" cy="300" r="250" fill="none" stroke="#fff" stroke-width="44" transform="rotate(180 300 300)"/></mask>',
         '    <radialGradient id="dial-glow"><stop offset="0" stop-color="#EEECE4" stop-opacity=".5"/><stop offset="1" stop-color="#EEECE4" stop-opacity="0"/></radialGradient>',
@@ -143,8 +158,9 @@ def build():
         '  <g class="sky" mask="url(#dial-sweep)" fill="none">',
     ]
     rows += ["    " + p for p in sky()]
+    rows += ["  </g>"]
+    rows += ["  " + lane for lane in lanes()]
     rows += [
-        "  </g>",
         '  <circle class="rail" cx="300" cy="300" r="234"/>',
         '  <circle class="rail" cx="300" cy="300" r="226"/>',
         '  <circle class="ticks-quarter" cx="300" cy="300" r="230"/>',
