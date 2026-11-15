@@ -371,7 +371,7 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
 /* A real sequence, so it is numbered */
 .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem clamp(1.5rem, 4vw, 3.5rem); counter-reset: step; }
 .steps li { counter-increment: step; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0 1rem; }
-.steps li::before { content: counter(step); grid-row: span 2; font-size: 3.4rem; font-weight: 760; font-stretch: 70%; line-height: .9; color: color-mix(in srgb, var(--agent) 50%, var(--night-0)); }
+.steps li::before { content: counter(step); grid-column: 1; grid-row: 1 / span 4; font-size: 3.4rem; font-weight: 760; font-stretch: 70%; line-height: .9; color: color-mix(in srgb, var(--agent) 50%, var(--night-0)); }
 .steps h4 { font-size: 1.0625rem; font-weight: 650; }
 .steps p { margin-top: .25rem; color: var(--mist); font-size: 1rem; }
 
@@ -591,4 +591,45 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
 .card-doc h3 { font-size: 1.125rem; font-weight: 680; font-stretch: 94%; line-height: 1.25; }
 @media (max-width: 900px) {
   .doors, .page-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Round 4: answers, roles, timelines, a sample record, a privacy page */
+.steps li > * { grid-column: 2; }
+.steps.of-test li::before { color: color-mix(in srgb, var(--test) 50%, var(--night-0)); }
+.steps .when { margin-top: .15rem; font-size: .875rem; font-weight: 600; color: var(--dim); }
+.blurb { max-width: 46rem; color: var(--mist); }
+
+/* Questions, answered: the question on the left, the answer beside it */
+.qa { display: grid; }
+.qa > div { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: .4rem clamp(2rem, 5vw, 4.5rem); align-items: baseline; padding: 1.2rem 0; border-top: 1px solid var(--rule); }
+.qa > div:last-child { border-bottom: 1px solid var(--rule); }
+.qa dt { font-size: 1.0625rem; font-weight: 650; line-height: 1.35; color: var(--moon); }
+.qa dd { max-width: 40rem; color: var(--mist); }
+.qa strong { font-weight: 650; color: var(--moon); }
+
+/* Who does what: the agent in its practice color, the operator in lamp amber,
+   and what stays with the client as an open mark */
+.roles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem clamp(1.5rem, 4vw, 3.5rem); }
+.role { display: grid; gap: .9rem; align-content: start; }
+.role h4 { display: flex; align-items: center; gap: .6rem; font-size: 1.0625rem; font-weight: 680; font-stretch: 94%; line-height: 1.25; color: var(--moon); }
+.role h4::before { content: ""; flex: none; width: 1.5rem; height: .34rem; border-radius: 999px; background: var(--test); }
+.role.by-person h4::before { background: var(--lamp); }
+.role.by-client h4::before { height: .5rem; background: none; border: 2px solid var(--moon); }
+.role ul { display: grid; gap: .6rem; color: var(--mist); }
+
+/* A sample audit record */
+.ledger-wrap { overflow-x: auto; }
+.ledger { width: 100%; min-width: 46rem; border-collapse: collapse; font-size: .9375rem; line-height: 1.45; }
+.ledger th { padding: 0 1.2rem .6rem 0; border-bottom: 1px solid var(--rule); text-align: left; font-size: .8125rem; font-weight: 600; color: var(--dim); }
+.ledger td { padding: .7rem 1.2rem .7rem 0; border-bottom: 1px solid var(--rule); vertical-align: top; color: var(--mist); }
+.ledger td:first-child { white-space: nowrap; font-weight: 600; font-stretch: 82%; color: var(--dim); font-variant-numeric: tabular-nums; }
+.ledger td.by-agent { color: var(--agent); white-space: nowrap; }
+.ledger td.by-person { color: var(--lamp); white-space: nowrap; }
+
+/* Privacy */
+.prose { display: grid; gap: 2.5rem; }
+.prose > div { display: grid; gap: .8rem; max-width: 44rem; }
+.prose p { color: var(--mist); }
+@media (max-width: 900px) {
+  .qa > div, .roles { grid-template-columns: minmax(0, 1fr); }
 }

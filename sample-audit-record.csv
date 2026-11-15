@@ -1,0 +1,12 @@
+time,event,document,source,actor,actor_type,detail
+2026-03-10 23:42,received,"Fax, 14 pages","Fax line, job 0412",Operations agent,agent,Split into 2 documents
+2026-03-10 23:44,proposed,"Medical records, 12 pages","Fax 0412, pages 3 to 14",Operations agent,agent,File to Matter 1874 > Medical records; notify case manager
+2026-03-10 23:44,proposed,"Cover letter, 2 pages","Fax 0412, pages 1 to 2",Operations agent,agent,File to Matter 1847 > Correspondence; flagged: no matter number on the letter
+2026-03-11 01:07,received,Notice of hearing,Email from the court clerk,Operations agent,agent,Hearing date read from the notice
+2026-03-11 01:07,proposed,Notice of hearing,Email from the court clerk,Operations agent,agent,File to Matter 2291 > Court notices; calendar: hearing 2026-03-19 09:30; notify assigned attorney
+2026-03-11 08:04,corrected,"Cover letter, 2 pages",Approval in Slack,Case manager,person,Folder changed to Matter 1874 > Correspondence; correction saved as a rule
+2026-03-11 08:04,filed,"Cover letter, 2 pages",Approval in Slack,Operations agent,agent,Filed to Matter 1874 > Correspondence
+2026-03-11 08:05,approved,"Medical records, 12 pages",Approval in Slack,Case manager,person,Approved as proposed
+2026-03-11 08:05,filed,"Medical records, 12 pages",Approval in Slack,Operations agent,agent,Filed to Matter 1874 > Medical records; case manager notified
+2026-03-11 08:05,approved,Notice of hearing,Approval in Slack,Case manager,person,Approved as proposed
+2026-03-11 08:05,filed,Notice of hearing,Approval in Slack,Operations agent,agent,Filed to Matter 2291 > Court notices; calendar entry created; assigned attorney notified

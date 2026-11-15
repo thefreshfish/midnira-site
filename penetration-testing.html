@@ -415,9 +415,9 @@
       <div class="block">
         <h3 class="heading">What we test</h3>
         <dl class="takes">
-          <div><dt>Web applications and APIs</dt><dd>Authentication, authorization, business logic and the paths between them.</dd></div>
-          <div><dt>Networks</dt><dd>External exposure and internal movement, from the first foothold to what an attacker could reach.</dd></div>
-          <div><dt>Cloud and identity</dt><dd>Misconfigurations, excess permissions and trust relationships across cloud accounts and identity providers.</dd></div>
+          <div><dt>Web applications and APIs</dt><dd>Authentication, authorization, business logic and the paths between them. Tested against the OWASP Web Security Testing Guide and the OWASP API Security Top 10.</dd></div>
+          <div><dt>Networks</dt><dd>External exposure and internal movement, from the first foothold to what an attacker could reach. The method follows NIST SP 800-115 and PTES.</dd></div>
+          <div><dt>Cloud and identity</dt><dd>Misconfigurations, excess permissions and trust relationships across cloud accounts and identity providers. Attack paths are described in MITRE ATT&amp;CK terms.</dd></div>
         </dl>
       </div>
 
@@ -462,6 +462,39 @@
         </div>
       </div>
 
+      <div class="block" id="roles">
+        <h3 class="heading">Who does what</h3>
+        <div class="roles">
+          <div class="role of-test">
+            <h4>The agent</h4>
+            <ul>
+              <li>Maps the hosts, services and endpoints inside the signed scope</li>
+              <li>Checks them for known weaknesses and misconfigurations</li>
+              <li>Re-checks fixes after you have made them</li>
+              <li>Flags what it finds for the operator, with the evidence</li>
+            </ul>
+          </div>
+          <div class="role by-person">
+            <h4>The operator</h4>
+            <ul>
+              <li>Agrees the scope and the test window with you</li>
+              <li>Runs every exploit by hand; the agent does not exploit anything</li>
+              <li>Chains findings into the attacks that tools miss</li>
+              <li>Reproduces, rates and writes up every finding</li>
+            </ul>
+          </div>
+          <div class="role by-client">
+            <h4>Never without your sign-off</h4>
+            <ul>
+              <li>Any target outside the signed scope</li>
+              <li>Anything that could interrupt service or change data</li>
+              <li>Testing outside the agreed window</li>
+            </ul>
+          </div>
+        </div>
+        <p class="blurb">Built into the tooling: a scope check in code before any contact, which blocks whatever it cannot verify; rate limits; no denial-of-service tools; and a log of every agent action.</p>
+      </div>
+
       <div class="split split-wide-left">
         <article class="paper tilt-r" id="finding" aria-labelledby="finding-title">
           <p class="sub">A sample finding, as it appears in a report</p>
@@ -500,6 +533,7 @@
               <li>A prioritized fix list</li>
               <li>A readout call with your team</li>
               <li>A retest of the fixes</li>
+              <li>A signed attestation letter for auditors, insurers and customers</li>
             </ul>
           </div>
           <div class="block">
@@ -511,6 +545,63 @@
             </dl>
           </div>
         </div>
+      </div>
+
+      <div class="block">
+        <h3 class="heading">What the test is used for</h3>
+        <dl class="takes">
+          <div><dt>A SOC 2 audit</dt><dd>The report and the retest results show your auditor that an independent test was done and that the findings were fixed.</dd></div>
+          <div><dt>Cyber insurance</dt><dd>Insurers ask whether you test and when. A signed attestation letter answers that without handing over the findings.</dd></div>
+          <div><dt>Customer questionnaires</dt><dd>The attestation letter and the report summary give a customer's security team what they ask for.</dd></div>
+        </dl>
+        <p class="fine">A penetration test supports these requirements. It does not by itself make a company compliant.</p>
+      </div>
+
+      <div class="block">
+        <h3 class="heading">How a test runs</h3>
+        <ol class="steps of-test">
+          <li><h4>Scoping call</h4><p class="when">30 minutes</p><p>We agree what is in scope, what is left alone and when testing can happen.</p></li>
+          <li><h4>Authorization</h4><p>You sign the scope, the test window and the emergency contacts. Nothing starts before this.</p></li>
+          <li><h4>Testing</h4><p class="when">One to two weeks</p><p>The agent and the operator work inside the window. You hear about a high-severity finding the same day.</p></li>
+          <li><h4>Report</h4><p class="when">Within five business days</p><p>Findings with steps to reproduce, severity ratings and a prioritized fix list.</p></li>
+          <li><h4>Readout</h4><p>A call with your team to walk through the findings and the fixes.</p></li>
+          <li><h4>Retest</h4><p class="when">Within 60 days</p><p>We check that the fixes hold and update the report.</p></li>
+        </ol>
+      </div>
+
+      <div class="split">
+        <div class="block">
+          <h3 class="heading">What we need from you</h3>
+          <ul class="gets">
+            <li>The applications, hosts and addresses in scope, and anything to leave alone</li>
+            <li>Test accounts for each role we should test</li>
+            <li>A test window, and who to call if something looks wrong</li>
+            <li>A signature from someone who can authorize testing of these systems</li>
+          </ul>
+          <p class="blurb">We give you the address the testing comes from, so your team can recognize it.</p>
+        </div>
+        <div class="block">
+          <h3 class="heading">How we price</h3>
+          <dl class="pairs">
+            <div><dt>A fixed price for a defined scope</dt><dd>Quoted in writing after the scoping call. One retest of the fixes is included.</dd></div>
+            <div><dt>What sets the price</dt><dd>The number of applications, user roles, addresses and cloud accounts, and how deep the testing goes.</dd></div>
+          </dl>
+        </div>
+      </div>
+
+      <div class="block" id="questions">
+        <div class="head">
+          <h2 class="headline">The questions buyers ask, answered.</h2>
+        </div>
+        <dl class="qa">
+          <div><dt>Is it safe to run on production?</dt><dd>Yes, with limits. The agent maps and checks for known weaknesses at a controlled rate. Anything that could interrupt service or change data needs your approval in advance, and you choose the test window. We can also test a staging copy if you have one.</dd></div>
+          <div><dt>Who checks what the agent finds?</dt><dd>The operator. Every finding in your report has been reproduced by hand, so an agent's false alarm does not reach you.</dd></div>
+          <div><dt>What does the AI provider see?</dt><dd>The agents run on Claude, the AI model made by Anthropic. Test data that passes through the agents is not used for model training. Your agreement names the AI tooling and explains how your data is handled, including how long the provider keeps it.</dd></div>
+          <div><dt>Can you test without AI?</dt><dd>Yes. A manual test uses no AI tooling, for environments where it is not permitted.</dd></div>
+          <div><dt>How is this different from a vulnerability scan?</dt><dd>A scan lists known weaknesses. A penetration test shows what an attacker can do with them: which can be exploited, how they chain together and what they expose. Each finding comes with the steps to reproduce it.</dd></div>
+          <div><dt>How long does it take?</dt><dd>Most tests run one to two weeks, and the report follows within five business days. The scoping call sets the dates.</dd></div>
+          <div><dt>Is a retest included?</dt><dd>Yes. One retest of the fixes is included in the price.</dd></div>
+        </dl>
       </div>
 
       <p class="crosslinks">Both of Midnira's practices run on <a class="textlink" href="/#method">the same three rules</a>. Read <a class="textlink" href="/#data">how your data is handled</a>, or see the other practice, <a class="textlink" href="/ai-operations">AI operations</a>.</p>
@@ -540,7 +631,7 @@
         <p>&copy; 2026 Midnira LLC</p>
         <div class="notes">
           <p>Penetration testing is performed only with written authorization from the system owner.</p>
-          <p>This site counts visits with Cloudflare Web Analytics, which sets no cookies.</p>
+          <p>This site counts visits with Cloudflare Web Analytics, which sets no cookies. <a href="/privacy">Privacy</a></p>
         </div>
       </div>
     </footer>
