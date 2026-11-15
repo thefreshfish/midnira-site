@@ -291,6 +291,7 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
 .flow { display: grid; gap: clamp(3rem, 6vw, 5rem); }
 .head { display: grid; gap: 1.4rem; max-width: 58rem; }
 .block { display: grid; gap: 1.5rem; min-width: 0; }
+.block[id] { scroll-margin-top: 5rem; }   /* a linked block lands below the sticky header */
 .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3rem clamp(2rem, 5vw, 4.5rem); align-items: start; }
 .split-wide-left { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
 .split-wide-right { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
