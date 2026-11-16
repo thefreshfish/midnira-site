@@ -239,6 +239,70 @@
 
       <p class="fieldnote">For a law firm, the agents read incoming mail, faxes and court notices, propose where each document belongs and who needs to see it, and then wait. Staff approve each filing with a click. Nothing is filed or sent without that approval.</p>
 
+      <div class="split split-code" id="approval-gate">
+        <div class="block">
+          <h3 class="heading">The approval is enforced in code</h3>
+          <p class="blurb">An instruction that tells a model to wait for approval can be ignored, or talked around by a cleverly worded document. So that rule does not live in the agent's instructions. Every filing passes through a gate that Midnira wrote, and the agent has no other way to file. The agent proposes. Code checks that a person approved.</p>
+          <dl class="pairs">
+            <div><dt>Approval</dt><dd>A filing goes ahead only when a person your firm has named as an approver has signed off. Until then the proposal waits.</dd></div>
+            <div><dt>Exact match</dt><dd>An approval covers the proposal as that person saw it and the document as it arrived. If either changes afterwards, the filing is refused until a person approves it again.</dd></div>
+            <div><dt>Your correction</dt><dd>When your staff change the folder, their choice is what gets filed. A filing only goes into a folder that already exists.</dd></div>
+            <div><dt>Record</dt><dd>One approval files one document, once. Every decision goes into the record, the holds and refusals too.</dd></div>
+          </dl>
+          <p class="blurb">The agent runs under an account that cannot write approvals, so it cannot approve its own work. The gate's tests run without touching a client's systems.</p>
+        </div>
+        <!-- gate:start -->
+        <div class="source of-ops">
+          <p class="source-head"><code>gate.py</code><span>The check every filing goes through</span></p>
+          <pre tabindex="0" aria-label="Source code of the approval gate's decision"><code><span class="cm"># ---- a person's approval ----------------------------------------------</span>
+<span class="kw">if</span> approval <span class="kw">is</span> None:
+    <span class="kw">return</span> Decision(<span class="hold">HOLD</span>, pid, "no approval on record")
+who = approval.approver
+<span class="kw">if</span> approval.proposal != pid:
+    <span class="kw">return</span> Decision(<span class="no">DENY</span>, pid, "approval names a different proposal", who)
+<span class="kw">if</span> who <span class="kw">not</span> <span class="kw">in</span> approvers:
+    <span class="kw">return</span> Decision(<span class="no">DENY</span>, pid, f"{who} is not a named approver", who)
+<span class="cm"># an approval covers the proposal as that person saw it, nothing later</span>
+<span class="kw">if</span> approval.seen != proposal.digest():
+    <span class="kw">return</span> Decision(<span class="no">DENY</span>, pid, "proposal changed after it was approved",
+                    who)
+<span class="cm"># ---- the document, as received ----------------------------------------</span>
+<span class="kw">if</span> doc_sha256 <span class="kw">is</span> None:
+    <span class="kw">return</span> Decision(<span class="no">DENY</span>, pid, "document cannot be read", who)
+<span class="kw">if</span> doc_sha256 != proposal.sha256:
+    <span class="kw">return</span> Decision(<span class="no">DENY</span>, pid, "document changed since the agent read it",
+                    who)
+<span class="cm"># ---- once only --------------------------------------------------------</span>
+<span class="kw">if</span> filed <span class="kw">is</span> None:
+    <span class="kw">return</span> Decision(<span class="no">DENY</span>, pid, "record cannot be read", who)
+<span class="kw">if</span> filed:
+    <span class="kw">return</span> Decision(<span class="no">DENY</span>, pid, "already filed", who)
+<span class="cm"># the approver's folder wins over the agent's; neither can invent one</span>
+folder = approval.folder <span class="kw">or</span> proposal.folder
+<span class="kw">if</span> <span class="kw">not</span> has_folder(folder):
+    <span class="kw">return</span> Decision(<span class="no">DENY</span>, pid, f"no such folder: {folder}", who)
+<span class="kw">return</span> Decision(<span class="ok">ALLOW</span>, pid, f"approved by {who}", who, folder,
+                corrected=folder != proposal.folder)</code></pre>
+          <p class="source-head"><code>ops-file</code><span>What the agent gets back</span></p>
+          <pre class="term" aria-label="Output of three runs of the gate"><code><span class="cmd">$ ops-file fax-0412-b</span>
+<span class="hold">[HELD]</span> fax-0412-b :: no approval on record
+        document: Cover letter, 2 pages
+        proposed: Matter 1847/Correspondence
+
+<span class="cmd">$ ops-file fax-0412-b</span>
+<span class="ok">[FILED]</span> fax-0412-b :: approved by case.manager@example.com
+        document: Cover letter, 2 pages
+        filed to: Matter 1874/Correspondence (the approver changed the folder)
+
+<span class="cmd">$ ops-file mail-0107</span>
+<span class="no">[REFUSED]</span> mail-0107 :: proposal changed after it was approved
+        document: Notice of hearing
+        proposed: Matter 2291/Pleadings</code></pre>
+          <p class="fine">The code is copied from the gate as written. The output is the gate's own, run on the example night above. Before the last run, the agent's proposal was edited after it had been approved.</p>
+        </div>
+        <!-- gate:end -->
+      </div>
+
       <div class="block" id="sample-record">
         <h3 class="heading">A sample audit record</h3>
         <p class="blurb">This is the record one night leaves behind. Each row names the source, who proposed the action and who decided. The data is invented.</p>
