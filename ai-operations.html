@@ -239,17 +239,16 @@
 
       <p class="fieldnote">For a law firm, the agents read incoming mail, faxes and court notices, propose where each document belongs and who needs to see it, and then wait. Staff approve each filing with a click. Nothing is filed or sent without that approval.</p>
 
-      <div class="split split-code" id="approval-gate">
+      <div class="split split-code split-follow" id="approval-gate">
         <div class="block">
           <h3 class="heading">The approval is enforced in code</h3>
           <p class="blurb">An instruction that tells a model to wait for approval can be ignored, or talked around by a cleverly worded document. So that rule does not live in the agent's instructions. Every filing passes through a gate that Midnira wrote, and the agent has no other way to file. The agent proposes. Code checks that a person approved.</p>
           <dl class="pairs">
             <div><dt>Approval</dt><dd>A filing goes ahead only when a person your firm has named as an approver has signed off. Until then the proposal waits.</dd></div>
+            <div><dt>Signature</dt><dd>Every approval is signed where your staff give it, and the gate checks that signature before it trusts anything else in the approval. The agent holds no signing key, so it cannot approve its own work.</dd></div>
             <div><dt>Exact match</dt><dd>An approval covers the proposal as that person saw it and the document as it arrived. If either changes afterwards, the filing is refused until a person approves it again.</dd></div>
             <div><dt>Your correction</dt><dd>When your staff change the folder, their choice is what gets filed. A filing only goes into a folder that already exists.</dd></div>
-            <div><dt>Record</dt><dd>One approval files one document, once. Every decision goes into the record, the holds and refusals too.</dd></div>
           </dl>
-          <p class="blurb">The agent runs under an account that cannot write approvals, so it cannot approve its own work. The gate's tests run without touching a client's systems.</p>
         </div>
         <!-- gate:start -->
         <div class="source of-ops">
@@ -257,10 +256,14 @@
           <pre tabindex="0" aria-label="Source code of the approval gate's decision"><code><span class="cm"># ---- a person's approval ----------------------------------------------</span>
 <span class="kw">if</span> approval <span class="kw">is</span> None:
     <span class="kw">return</span> Decision(<span class="hold">HOLD</span>, pid, "no approval on record")
+<span class="cm"># only the approval channel can sign one; the agent holds no key</span>
+<span class="kw">if</span> <span class="kw">not</span> signed_by(approval, policy.keys):
+    <span class="kw">return</span> Decision(<span class="no">DENY</span>, pid,
+                    "approval is not signed by the approval channel")
 who = approval.approver
 <span class="kw">if</span> approval.proposal != pid:
     <span class="kw">return</span> Decision(<span class="no">DENY</span>, pid, "approval names a different proposal", who)
-<span class="kw">if</span> who <span class="kw">not</span> <span class="kw">in</span> approvers:
+<span class="kw">if</span> who <span class="kw">not</span> <span class="kw">in</span> policy.approvers:
     <span class="kw">return</span> Decision(<span class="no">DENY</span>, pid, f"{who} is not a named approver", who)
 <span class="cm"># an approval covers the proposal as that person saw it, nothing later</span>
 <span class="kw">if</span> approval.seen != proposal.digest():
@@ -274,7 +277,7 @@ who = approval.approver
                     who)
 <span class="cm"># ---- once only --------------------------------------------------------</span>
 <span class="kw">if</span> filed <span class="kw">is</span> None:
-    <span class="kw">return</span> Decision(<span class="no">DENY</span>, pid, "record cannot be read", who)
+    <span class="kw">return</span> Decision(<span class="no">DENY</span>, pid, "record cannot be verified", who)
 <span class="kw">if</span> filed:
     <span class="kw">return</span> Decision(<span class="no">DENY</span>, pid, "already filed", who)
 <span class="cm"># the approver's folder wins over the agent's; neither can invent one</span>
@@ -284,8 +287,13 @@ folder = approval.folder <span class="kw">or</span> proposal.folder
 <span class="kw">return</span> Decision(<span class="ok">ALLOW</span>, pid, f"approved by {who}", who, folder,
                 corrected=folder != proposal.folder)</code></pre>
           <p class="source-head"><code>ops-file</code><span>What the agent gets back</span></p>
-          <pre class="term" aria-label="Output of three runs of the gate"><code><span class="cmd">$ ops-file fax-0412-b</span>
+          <pre class="term" aria-label="Output of four runs of the gate"><code><span class="cmd">$ ops-file fax-0412-b</span>
 <span class="hold">[HELD]</span> fax-0412-b :: no approval on record
+        document: Cover letter, 2 pages
+        proposed: Matter 1847/Correspondence
+
+<span class="cmd">$ ops-file fax-0412-b</span>
+<span class="no">[REFUSED]</span> fax-0412-b :: approval is not signed by the approval channel
         document: Cover letter, 2 pages
         proposed: Matter 1847/Correspondence
 
@@ -298,9 +306,57 @@ folder = approval.folder <span class="kw">or</span> proposal.folder
 <span class="no">[REFUSED]</span> mail-0107 :: proposal changed after it was approved
         document: Notice of hearing
         proposed: Matter 2291/Pleadings</code></pre>
-          <p class="fine">The code is copied from the gate as written. The output is the gate's own, run on the example night above. Before the last run, the agent's proposal was edited after it had been approved.</p>
+          <p class="fine">The code is copied from the gate as written, and the output is the gate's own, run on the example night above. Before the second run, the agent wrote an approval for itself. Before the fourth, it edited a proposal that had already been approved.</p>
         </div>
         <!-- gate:end -->
+      </div>
+
+      <div class="split split-code split-follow" id="record-chain">
+        <div class="block">
+          <h3 class="heading">A record that checks itself</h3>
+          <p class="blurb">One approval files one document, once. Every decision goes into the record, the holds and refusals too.</p>
+          <dl class="pairs">
+            <div><dt>Chained</dt><dd>Each row carries a fingerprint of the row before it. A row that is changed afterwards no longer fits the rows around it.</dd></div>
+            <div><dt>Anchored</dt><dd>The latest fingerprint goes to you with each report. A record rewritten later, however carefully, no longer matches the fingerprint you hold.</dd></div>
+            <div><dt>Fails closed</dt><dd>If the record does not check out, the gate stops filing until a person has looked.</dd></div>
+          </dl>
+          <p class="blurb">The gate's tests run without touching a client's systems.</p>
+        </div>
+        <!-- chain:start -->
+        <div class="source of-ops">
+          <p class="source-head"><code>record.py</code><span>Each row is checked against the row before it</span></p>
+          <pre tabindex="0" aria-label="Source code of the record's chain check"><code><span class="kw">for</span> n, line <span class="kw">in</span> enumerate(lines, 1):
+    <span class="kw">try</span>:
+        row = json.loads(line)
+        prev, proposal, verdict = (row["prev"], row["proposal"],
+                                   row["verdict"])
+        <span class="kw">if</span> <span class="kw">not</span> isinstance(proposal, str):
+            <span class="kw">raise</span> TypeError(proposal)
+    <span class="kw">except</span> (ValueError, KeyError, TypeError):
+        <span class="kw">return</span> stop(f"row {n} cannot be read")
+    <span class="kw">if</span> prev != head:
+        <span class="kw">return</span> stop(f"row {n} does not follow the row before it")
+    <span class="kw">if</span> verdict == FILED:
+        filed.add(proposal)
+    head = _hash(line)
+    heads.append(head)</code></pre>
+          <p class="source-head"><code>ops-record</code><span>What a changed record looks like</span></p>
+          <pre class="term" aria-label="Output of four checks of the record"><code><span class="cmd">$ ops-record verify</span>
+<span class="ok">record OK</span>: 6 rows, 2 filed
+head: c976b44297d43ed60431caba4a05d83895f2410c2ec555ba4c420491bc391c9e
+
+<span class="cmd">$ ops-record verify</span>
+<span class="no">record BROKEN</span>: row 3 does not follow the row before it (2 rows verified before it)
+
+<span class="cmd">$ ops-record verify</span>
+<span class="ok">record OK</span>: 5 rows, 2 filed
+head: 7a04d4db68bd0e3af0125e598e46b6055236ea42cb1a9374db0b197f8788988d
+
+<span class="cmd">$ ops-record verify --anchor c976b44297d43ed60431caba4a05d83895f2410c2ec555ba4c420491bc391c9e</span>
+<span class="no">record BROKEN</span>: it does not contain the anchored head, so rows were changed or removed after that head was issued</code></pre>
+          <p class="fine">Copied and run the same way. Before the second check, one row was edited by hand. Before the last two, a row was removed and every later fingerprint recomputed: the chain alone cannot see that, and the fingerprint from the first check can.</p>
+        </div>
+        <!-- chain:end -->
       </div>
 
       <div class="block" id="sample-record">
