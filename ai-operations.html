@@ -316,7 +316,7 @@ folder = approval.folder <span class="kw">or</span> proposal.folder
           <h3 class="heading">A record that checks itself</h3>
           <p class="blurb">One approval files one document, once. Every decision goes into the record, the holds and refusals too.</p>
           <dl class="pairs">
-            <div><dt>Chained</dt><dd>Each row carries a fingerprint of the row before it. A row that is changed afterwards no longer fits the rows around it.</dd></div>
+            <div><dt>Chained</dt><dd>Each row carries a fingerprint of the row before it. A row that is changed afterwards no longer fits the row after it.</dd></div>
             <div><dt>Anchored</dt><dd>The latest fingerprint goes to you with each report. A record rewritten later, however carefully, no longer matches the fingerprint you hold.</dd></div>
             <div><dt>Fails closed</dt><dd>If the record does not check out, the gate stops filing until a person has looked.</dd></div>
           </dl>
@@ -332,27 +332,29 @@ folder = approval.folder <span class="kw">or</span> proposal.folder
                                    row["verdict"])
         <span class="kw">if</span> <span class="kw">not</span> isinstance(proposal, str):
             <span class="kw">raise</span> TypeError(proposal)
-    <span class="kw">except</span> (ValueError, KeyError, TypeError):
+    <span class="kw">except</span> (ValueError, KeyError, TypeError, RecursionError):
         <span class="kw">return</span> stop(f"row {n} cannot be read")
     <span class="kw">if</span> prev != head:
         <span class="kw">return</span> stop(f"row {n} does not follow the row before it")
-    <span class="kw">if</span> verdict == FILED:
+    <span class="kw">if</span> verdict == FILING:
+        started.add(proposal)
+    <span class="kw">elif</span> verdict == FILED:
         filed.add(proposal)
     head = _hash(line)
     heads.append(head)</code></pre>
           <p class="source-head"><code>ops-record</code><span>What a changed record looks like</span></p>
           <pre class="term" aria-label="Output of four checks of the record"><code><span class="cmd">$ ops-record verify</span>
-<span class="ok">record OK</span>: 6 rows, 2 filed
-head: c976b44297d43ed60431caba4a05d83895f2410c2ec555ba4c420491bc391c9e
+<span class="ok">record OK</span>: 8 rows, 2 filed
+head: 1d9079e34ded53d3b614df744916abc02df03cdf510082e8ab9b359cdb29f467
 
 <span class="cmd">$ ops-record verify</span>
 <span class="no">record BROKEN</span>: row 3 does not follow the row before it (2 rows verified before it)
 
 <span class="cmd">$ ops-record verify</span>
-<span class="ok">record OK</span>: 5 rows, 2 filed
-head: 7a04d4db68bd0e3af0125e598e46b6055236ea42cb1a9374db0b197f8788988d
+<span class="ok">record OK</span>: 7 rows, 2 filed
+head: 03764203054ed0ab43e7d9e6efb1663f34a6a770a06f5e05ec5258c5dad5b539
 
-<span class="cmd">$ ops-record verify --anchor c976b44297d43ed60431caba4a05d83895f2410c2ec555ba4c420491bc391c9e</span>
+<span class="cmd">$ ops-record verify --anchor 1d9079e34ded53d3b614df744916abc02df03cdf510082e8ab9b359cdb29f467</span>
 <span class="no">record BROKEN</span>: it does not contain the anchored head, so rows were changed or removed after that head was issued</code></pre>
           <p class="fine">Copied and run the same way. Before the second check, one row was edited by hand. Before the last two, a row was removed and every later fingerprint recomputed: the chain alone cannot see that, and the fingerprint from the first check can.</p>
         </div>
