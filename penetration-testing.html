@@ -499,9 +499,11 @@
           <h3 class="heading">A harness we built ourselves</h3>
           <p class="blurb">The testing agent runs inside a harness that Midnira wrote. Off-the-shelf autonomous testing tools let the model drive. For work on a client's live systems, we wanted the limits in code that we own and can show you. The model chooses what to look at next. Code decides whether it may.</p>
           <dl class="pairs">
-            <div><dt>Scope</dt><dd>Each target is checked against the signed authorization at the moment of contact. A name is looked up again every time, and the tool is given the approved addresses, not the name. What cannot be verified is refused.</dd></div>
+            <div><dt>Scope</dt><dd>Each target is checked against the signed authorization at the moment of contact. A name is looked up again every time, or tied to the server address written in the signed scope. A port scan is then given the approved addresses, not the name, and a web scan keeps the site's name but can only resolve it to the approved address. What cannot be verified is refused.</dd></div>
             <div><dt>Options</dt><dd>Every tool has a short list of options it may use and speed caps the agent cannot lift. Anything else is refused.</dd></div>
-            <div><dt>Pace</dt><dd>One rate budget covers every worker, so agents running in parallel cannot crowd a host.</dd></div>
+            <div><dt>Pace</dt><dd>One rate budget covers every worker, and only one scan runs against a host at a time, so agents running in parallel cannot crowd it.</dd></div>
+            <div><dt>Window</dt><dd>No scan starts outside the test window you signed, and one still running when the window closes is stopped.</dd></div>
+            <div><dt>Accounts</dt><dd>Scans run under a separate account, started only by the harness. The agent's own account has no route to your systems.</dd></div>
             <div><dt>Record</dt><dd>Every decision goes into the log, the refusals too, with the exact command that ran.</dd></div>
           </dl>
           <p class="blurb">No exploitation or denial-of-service tools are wired into it. Its tests run without touching a network, and each stage of the build gets a security review before the next begins.</p>
@@ -548,6 +550,36 @@
           <p class="fine">The code is copied from the harness as written. The output is the harness's own, run against the example scope above.</p>
         </div>
         <!-- harness:end -->
+      </div>
+
+      <div class="split split-code" id="detection">
+        <div class="block">
+          <h3 class="heading">The agent detects. It does not exploit.</h3>
+          <p class="blurb">The agent's vulnerability scanner can load the folders of checks listed here and no others. They are the ones that look for what a system exposes. The folders that confirm a weakness by exploiting it are not on the list.</p>
+          <dl class="pairs">
+            <div><dt>Loaded</dt><dd>Thirteen folders, covering the technology in use, exposed files and admin panels, misconfigurations, takeover risks, network services, TLS and DNS.</dd></div>
+            <div><dt>Left out</dt><dd>Checks that confirm a weakness by exploiting it, default-password attempts and fuzzing. When a version number points to a known vulnerability, the agent flags it and the operator confirms it by hand.</dd></div>
+            <div><dt>Kept out</dt><dd>A folder added by a later update stays out until it has been reviewed. If the agent asks for an excluded category, the request is refused and logged.</dd></div>
+          </dl>
+        </div>
+        <!-- detect:start -->
+        <div class="source">
+          <p class="source-head"><code>tools.py</code><span>The only checks the scanner may load</span></p>
+          <pre tabindex="0" aria-label="Source code listing the folders of checks the scanner may load and the kinds it never runs"><code>NUCLEI_TEMPLATE_DIRS = (
+    "http/technologies", "http/exposures", "http/exposed-panels",
+    "http/misconfiguration", "http/miscellaneous", "http/takeovers",
+    "http/honeypot", "http/global-matchers",
+    "network/detection", "network/jarm", "javascript/detection",
+    "dns", "ssl",
+)
+
+<span class="cm"># Template tags nuclei never runs here. default-login tries default credentials</span>
+<span class="cm"># against the client's login pages (lockout risk; credential guessing is a</span>
+<span class="cm"># manual, operator-approved step, not recon).</span>
+NUCLEI_EXCLUDED_TAGS = frozenset({"dos", "intrusive", "fuzz", "default-login"})</code></pre>
+          <p class="fine">The code is copied from the harness as written.</p>
+        </div>
+        <!-- detect:end -->
       </div>
 
       <div class="split split-wide-left">
