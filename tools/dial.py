@@ -9,8 +9,8 @@ top and the hours run clockwise, once round in 24 hours. Colours that the
 page can theme are set by class in site.css; only the dusk and dawn taper
 is coloured here, because each step has its own width and colour.
 
-Each practice has a lane inside the sky band: AI operations on the outside,
-penetration testing on the inside. A lane runs from that practice's first
+Each practice has a lane inside the sky band: penetration testing on the
+outside, AI operations on the inside. A lane runs from that practice's first
 event of the night to its sign-off, and its events sit on it. The log beside
 the dial has one column per practice; a mark and its row share a data-i.
 """
@@ -21,7 +21,7 @@ import re
 
 C = 300
 BAND = 250          # the sky band
-LANES = {"ops": 255, "test": 245}   # the radius of each practice's lane in the band
+LANES = {"test": 255, "ops": 245}   # the radius of each practice's lane in the band
 EVENTS = [          # (hour, minute, who, practice) for the example night, in order
     (23, 42, "agent", "ops"), (1, 7, "agent", "ops"), (2, 30, "agent", "test"), (3, 18, "agent", "test"),
     (8, 5, "person", "ops"), (8, 40, "person", "test"),
@@ -145,7 +145,7 @@ def build():
     rows = [
         '<svg class="dial" viewBox="-20 0 640 576" role="img" aria-labelledby="dial-title dial-desc">',
         '  <title id="dial-title">One example night on a 24-hour dial</title>',
-        '  <desc id="dial-desc">Midnight is at the top. An outer lane shows AI operations, from a fax at 11:42 PM to staff approval at 8:05 AM. An inner lane shows a penetration test, from the test window opening at 2:30 AM to the operator reproducing a finding at 8:40 AM. A marker shows your local time. Two small dials show how many proposals are waiting for sign-off and the current phase of the moon.</desc>',
+        '  <desc id="dial-desc">Midnight is at the top. An outer lane shows a penetration test, from the test window opening at 2:30 AM to the operator reproducing a finding at 8:40 AM. An inner lane shows AI operations, from a fax at 11:42 PM to staff approval at 8:05 AM. A marker shows your local time. Two small dials show how many proposals are waiting for sign-off and the current phase of the moon.</desc>',
         "  <defs>",
         '    <mask id="dial-sweep" maskUnits="userSpaceOnUse" x="0" y="0" width="600" height="600"><circle class="sweep" cx="300" cy="300" r="250" fill="none" stroke="#fff" stroke-width="44" transform="rotate(180 300 300)"/></mask>',
         '    <radialGradient id="dial-glow"><stop offset="0" stop-color="#EEECE4" stop-opacity=".5"/><stop offset="1" stop-color="#EEECE4" stop-opacity="0"/></radialGradient>',
