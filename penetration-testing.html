@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; connect-src https://cloudflareinsights.com; base-uri 'none'; form-action 'none'">
-<title>Penetration testing | Midnira</title>
+<title>Penetration testing for apps, networks, cloud and AI | Midnira</title>
 <meta name="description" content="Agent-assisted penetration tests led by a certified operator. Targets are checked against the signed scope, and every finding is reproduced by a person.">
 <link rel="canonical" href="https://midnira.ai/penetration-testing">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Midnira">
-<meta property="og:title" content="Penetration testing | Midnira">
+<meta property="og:title" content="Penetration testing for apps, networks, cloud and AI | Midnira">
 <meta property="og:description" content="Agent-assisted penetration tests led by a certified operator.">
 <meta property="og:url" content="https://midnira.ai/penetration-testing">
 <meta property="og:image" content="https://midnira.ai/og.png">
@@ -414,10 +414,11 @@
     <div class="wrap flow">
       <div class="block">
         <h3 class="heading">What we test</h3>
-        <dl class="takes">
+        <dl class="takes takes-2">
           <div><dt>Web applications and APIs</dt><dd>Authentication, authorization, business logic and the paths between them. Tested against the OWASP Web Security Testing Guide and the OWASP API Security Top 10.</dd></div>
           <div><dt>Networks</dt><dd>External exposure and internal movement, from the first foothold to what an attacker could reach. The method follows NIST SP 800-115 and PTES.</dd></div>
           <div><dt>Cloud and identity</dt><dd>Misconfigurations, excess permissions and trust relationships across cloud accounts and identity providers. Attack paths are described in MITRE ATT&amp;CK terms.</dd></div>
+          <div><dt>AI applications and agents</dt><dd>Prompt injection, misuse of the tools an agent can call, data leaking between users, and what an agent can be talked into doing with the access it holds. Tested against the OWASP Top 10 for LLM Applications and the OWASP Top 10 for Agentic Applications.</dd></div>
         </dl>
       </div>
 
@@ -506,7 +507,7 @@
             <div><dt>Accounts</dt><dd>Scans run under a separate account, started only by the harness. The agent's own account has no route to your systems.</dd></div>
             <div><dt>Record</dt><dd>Every decision goes into the log, the refusals too, with the exact command that ran.</dd></div>
           </dl>
-          <p class="blurb">No exploitation or denial-of-service tools are wired into it. Its tests run without touching a network, and each stage of the build gets a security review before the next begins.</p>
+          <p class="blurb">No exploitation or denial-of-service tools are wired into it. Its tests run without touching a network, and each stage of the build gets a security review before the next begins. Our approval gate for AI operations was reviewed the same way: <a class="textlink" href="/gate-review">read what that review found</a>.</p>
         </div>
         <!-- harness:start -->
         <div class="source">
@@ -606,6 +607,10 @@ NUCLEI_EXCLUDED_TAGS = frozenset({"dos", "intrusive", "fuzz", "default-login"})<
             <h4>Fix</h4>
             <p>Check ownership on the server for every invoice request, and add a test that fails if one customer can read another's invoice.</p>
           </div>
+          <div>
+            <h4>How to spot it</h4>
+            <p>One signed-in account asks for invoice numbers in sequence, and most of them belong to other customers. Alert when a single session reads invoices from more than one customer account.</p>
+          </div>
           <div class="stamps">
             <span class="stamp">Flagged by agent <b>3:18 AM</b></span>
             <span class="stamp stamp-lamp">Reproduced by operator <b>8:40 AM</b></span>
@@ -617,11 +622,13 @@ NUCLEI_EXCLUDED_TAGS = frozenset({"dos", "intrusive", "fuzz", "default-login"})<
             <h3 class="heading">What you receive</h3>
             <ul class="gets">
               <li>A report with reproducible steps and severity ratings</li>
+              <li>Detection notes for every High and Critical finding: how to spot the attack in your logs</li>
               <li>A prioritized fix list</li>
               <li>A readout call with your team</li>
               <li>A retest of the fixes</li>
               <li>A signed attestation letter for auditors, insurers and customers</li>
             </ul>
+            <p class="blurb"><a class="textlink" href="/sample-attestation-letter.pdf">See a sample attestation letter</a></p>
           </div>
           <div class="block">
             <h3 class="heading">Ways to engage</h3>
@@ -632,6 +639,16 @@ NUCLEI_EXCLUDED_TAGS = frozenset({"dos", "intrusive", "fuzz", "default-login"})<
             </dl>
           </div>
         </div>
+      </div>
+
+      <div class="block" id="buyers">
+        <h3 class="heading">Who we test for</h3>
+        <dl class="takes takes-2">
+          <div><dt>Companies facing a SOC 2 audit</dt><dd>Software companies whose auditor or customers ask for an independent test. You get the report, the retest results and a letter to hand over.</dd></div>
+          <div><dt>Law firms</dt><dd>Firms whose clients and insurers ask how they protect what they hold. We test what faces the internet and what an intruder could reach from there.</dd></div>
+          <div><dt>Consultancies and IT providers</dt><dd>Firms that look after their own clients' systems and need an independent tester for those clients' yearly tests.</dd></div>
+          <div><dt>Firms under the FTC Safeguards Rule</dt><dd>Tax preparers, mortgage brokers, lenders and the other firms the rule covers. It asks for a penetration test each year unless a firm monitors its systems continuously, with an exemption for firms that hold records on fewer than 5,000 consumers.</dd></div>
+        </dl>
       </div>
 
       <div class="block">
@@ -671,9 +688,27 @@ NUCLEI_EXCLUDED_TAGS = frozenset({"dos", "intrusive", "fuzz", "default-login"})<
           <h3 class="heading">How we price</h3>
           <dl class="pairs">
             <div><dt>A fixed price for a defined scope</dt><dd>Quoted in writing after the scoping call. One retest of the fixes is included.</dd></div>
+            <div><dt>Where prices start</dt><dd>A test of one web application and its API starts at $5,000.</dd></div>
             <div><dt>What sets the price</dt><dd>The number of applications, user roles, addresses and cloud accounts, and how deep the testing goes.</dd></div>
           </dl>
         </div>
+      </div>
+
+      <div class="block" id="compare">
+        <h3 class="heading">How an agentic test compares</h3>
+        <div class="compare" role="region" aria-label="Three ways to test, compared" tabindex="0">
+          <table>
+            <thead><tr><td></td><th scope="col">A scanner or an AI-only product</th><th scope="col">A manual penetration test</th><th scope="col">A Midnira agentic test</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Who does the work</th><td data-l="A scanner or an AI-only product">Software, from start to finish</td><td data-l="A manual penetration test">A tester, by hand</td><td data-l="A Midnira agentic test">Agents for the wide, repetitive work and an operator for the rest</td></tr>
+              <tr><th scope="row">Ground covered</th><td data-l="A scanner or an AI-only product">Wide</td><td data-l="A manual penetration test">Bounded by the tester's hours</td><td data-l="A Midnira agentic test">Wide, with the operator's hours kept for the hard parts</td></tr>
+              <tr><th scope="row">Who confirms a finding</th><td data-l="A scanner or an AI-only product">The software</td><td data-l="A manual penetration test">The tester</td><td data-l="A Midnira agentic test">The operator, who reproduces each one by hand</td></tr>
+              <tr><th scope="row">Exploitation</th><td data-l="A scanner or an AI-only product">Automated, where the product attempts it</td><td data-l="A manual penetration test">By hand</td><td data-l="A Midnira agentic test">By hand only. The agent has no exploit tools.</td></tr>
+              <tr><th scope="row">What keeps the tooling in scope</th><td data-l="A scanner or an AI-only product">The product's own settings</td><td data-l="A manual penetration test">The tester</td><td data-l="A Midnira agentic test">A scope gate in code, speed caps and a log of every action</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="fine">The first two columns describe each kind of service in general. Individual products and firms differ.</p>
       </div>
 
       <div class="block" id="questions">
@@ -684,6 +719,9 @@ NUCLEI_EXCLUDED_TAGS = frozenset({"dos", "intrusive", "fuzz", "default-login"})<
           <div><dt>Is it safe to run on production?</dt><dd>Yes, with limits. The agent maps and checks for known weaknesses at a controlled rate. Anything that could interrupt service or change data needs your approval in advance, and you choose the test window. We can also test a staging copy if you have one.</dd></div>
           <div><dt>Who checks what the agent finds?</dt><dd>The operator. Every finding in your report has been reproduced by hand, so an agent's false alarm does not reach you.</dd></div>
           <div><dt>What does the AI provider see?</dt><dd>The agents run on Claude, the AI model made by Anthropic. Test data that passes through the agents is not used for model training. Your agreement names the AI tooling and explains how your data is handled, including how long the provider keeps it.</dd></div>
+          <div><dt>Who sees our systems and data?</dt><dd>One person at Midnira: the founder, who runs your test. There are no subcontractors and no offshore staff, and Midnira is based in the United States. Anthropic processes the text the agents read, as the model provider.</dd></div>
+          <div><dt>How is the report delivered, and how long is the evidence kept?</dt><dd>The report and its evidence are sent to you encrypted. Your agreement sets how long the evidence is kept. It is then deleted, and the deletion is confirmed in writing.</dd></div>
+          <div><dt>Can we sign an NDA first?</dt><dd>Yes. We sign an NDA before the scoping call if you want one.</dd></div>
           <div><dt>Can you test without AI?</dt><dd>Yes. A manual test uses no AI tooling, for environments where it is not permitted.</dd></div>
           <div><dt>How is this different from a vulnerability scan?</dt><dd>A scan lists known weaknesses. A penetration test shows what an attacker can do with them: which can be exploited, how they chain together and what they expose. Each finding comes with the steps to reproduce it.</dd></div>
           <div><dt>How long does it take?</dt><dd>Most tests run one to two weeks, and the report follows within five business days. The scoping call sets the dates.</dd></div>

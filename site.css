@@ -297,6 +297,7 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
 .split-wide-right { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
 
 .takes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.75rem clamp(1.5rem, 4vw, 3.5rem); }
+.takes-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }   /* four entries read better two by two */
 .pairs { display: grid; gap: 1.3rem; }
 .takes dt, .pairs dt { font-weight: 650; color: var(--moon); }
 .takes dd, .pairs dd { margin-top: .25rem; color: var(--mist); font-size: 1rem; }
@@ -658,3 +659,33 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
 @media (max-width: 900px) {
   .qa > div, .roles { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Four facts under the hero's buttons. Each is stated in full further down the site. */
+.proof { display: flex; flex-wrap: wrap; gap: .45rem 1.6rem; font-size: .9375rem; color: var(--mist); }
+.proof li { padding-left: 1.05rem; background: radial-gradient(circle at .25rem .7em, var(--lamp) 0 .19rem, transparent .22rem) no-repeat; }
+
+/* Three ways to test, side by side. On a narrow screen the table scrolls inside its own box. */
+.compare { overflow-x: auto; }
+.compare table { width: 100%; min-width: 42rem; border-collapse: collapse; table-layout: fixed; }
+.compare th, .compare td { padding: .95rem 1.5rem .95rem 0; border-top: 1px solid var(--rule); text-align: left; vertical-align: top; font-weight: 400; color: var(--mist); }
+.compare thead th, .compare thead td { border-top: 0; font-size: .875rem; color: var(--dim); }
+.compare thead td { width: 21%; }
+.compare tbody th { font-weight: 650; color: var(--moon); }
+.compare tr > :last-child { padding-right: 0; color: var(--moon); }
+.compare thead th:last-child { color: var(--lamp); }
+.compare tbody tr:last-child > * { border-bottom: 1px solid var(--rule); }
+@media (max-width: 640px) {   /* stacked: each row becomes a short list, and each cell names its column */
+  .compare table { min-width: 0; }
+  .compare thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .compare tr, .compare tbody th, .compare td { display: block; }
+  .compare tbody th { padding: 1.1rem 0 .3rem; }
+  .compare td { padding: .35rem 0; border-top: 0; }
+  .compare td::before { content: attr(data-l); display: block; font-size: .8125rem; color: var(--dim); }
+  .compare td:last-child { padding-bottom: 1.1rem; }
+  .compare tbody tr:last-child > * { border-bottom: 0; }
+  .compare tbody tr:last-child td:last-child { border-bottom: 1px solid var(--rule); }
+}
+
+/* A numbered list inside a text page (the field note). */
+.prose .repro { gap: .7rem; color: var(--mist); }
+.prose .repro strong { font-weight: 650; color: var(--moon); }

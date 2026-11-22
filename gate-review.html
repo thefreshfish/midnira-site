@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; connect-src https://cloudflareinsights.com; base-uri 'none'; form-action 'none'">
+<title>Field note: a security review of our own approval gate | Midnira</title>
+<meta name="description" content="Before Midnira's approval gate carried any client work, a security review found 14 things to fix. This note lists them and says what code alone could not settle.">
+<link rel="canonical" href="https://midnira.ai/gate-review">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Midnira">
+<meta property="og:title" content="Field note: a security review of our own approval gate | Midnira">
+<meta property="og:description" content="A security review of our own approval gate found 14 things to fix. All 14 are listed.">
+<meta property="og:url" content="https://midnira.ai/gate-review">
+<meta property="og:image" content="https://midnira.ai/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#080A1F">
+<link rel="icon" href="favicon.png" type="image/png" sizes="64x64">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=Source+Serif+4:opsz,wght@8..60,400..700&display=swap">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<svg class="svg-defs" width="0" height="0" aria-hidden="true" focusable="false">
+  <filter id="ink" x="-4%" y="-12%" width="108%" height="124%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" seed="7" result="grain"/>
+    <feDisplacementMap in="SourceGraphic" in2="grain" scale="1.3" result="rough"/>
+    <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -4 3.3" result="wear"/>
+    <feComposite in="rough" in2="wear" operator="in"/>
+  </filter>
+</svg>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Midnira home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><g class="orbit"><circle cx="16" cy="17" r="11" fill="none" stroke="currentColor" stroke-width="1.7" stroke-dasharray="59.1 10" stroke-dashoffset="-5" transform="rotate(-90 16 17)"/><circle class="orbit-dot" cx="16" cy="6" r="2.5"/></g></svg>
+      Midnira
+    </a>
+    <nav class="nav" aria-label="Site">
+      <a href="/penetration-testing">Penetration testing</a>
+      <a href="/ai-operations">AI operations</a>
+      <a href="/#method">How we work</a>
+      <a href="/#about">About</a>
+      <a class="btn btn-lamp" href="#contact">Get in touch</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero page-head" aria-labelledby="page-title">
+    <canvas class="stars" data-seed="1116" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <p class="fine">Field note, November 22, 2026</p>
+      <h1 class="poster" id="page-title">We attacked our own approval gate before a client's documents went near it.</h1>
+      <p class="lede">Midnira's approval gate decides whether a document an agent wants to file is actually filed. Before it carried any real work, we put it through a security review. The review found 14 things to fix. All 14 are fixed, and this note lists them.</p>
+    </div>
+  </section>
+
+  <section class="band" aria-label="Field note">
+    <div class="wrap prose">
+      <div>
+        <h2 class="heading">Why review it</h2>
+        <p>Everything the AI operations page says about approval rests on this one piece of code. An agent that has been misled by a cleverly worded document will try whatever it can reach, so the gate has to hold against the agent it serves. Code like that should be attacked early.</p>
+        <p>The gate's code and its real output are on the <a class="textlink" href="/ai-operations#approval-gate">AI operations page</a>.</p>
+      </div>
+      <div>
+        <h2 class="heading">How the review ran</h2>
+        <p>Two AI reviewers worked separately, each on its own copy of the code. Neither saw the other's notes or the author's opinion of the code. One played an agent that had been turned against its operator and tried to get a document filed without approval. The other read every line and checked each sentence on our public page against what the code does. The author then made a third pass.</p>
+        <p>Every finding had to be reproduced before anything was changed. After the fixes, all three sets of proofs were run again on the fixed code.</p>
+      </div>
+      <div>
+        <h2 class="heading">What it found</h2>
+        <ol class="repro">
+          <li><strong>A filing could land with no record.</strong> If the record row could not be written, the document still moved. A row is now written and saved to disk before the document moves, and another after.</li>
+          <li><strong>A failed write could leave half a row.</strong> Record rows are now written whole or taken back out.</li>
+          <li><strong>An odd signature crashed the gate.</strong> A signature with unusual characters stopped it before anything was recorded.</li>
+          <li><strong>A blank fingerprint passed the record check.</strong> Checking the record against an empty fingerprint behaved as if none had been asked for.</li>
+          <li><strong>A weak signing key allowed forged approvals.</strong> A key of 32 zero bytes let anyone sign. Keys of that kind are now refused.</li>
+          <li><strong>The caller's settings could run code inside the gate.</strong> The tools now start without reading the caller's Python settings.</li>
+          <li><strong>A file could be swapped while it was being filed.</strong> A temporary file in the destination folder could be replaced, so the wrong document was filed under the approved name. A document now has no name until it is complete.</li>
+          <li><strong>Paths could be steered outside the store.</strong> Folders reached through symbolic links are no longer followed. Each path is walked one folder at a time.</li>
+          <li><strong>A deleted record quietly started again.</strong> The gate no longer creates the record. If the record is missing, or is not the gate's own, the gate stops.</li>
+          <li><strong>A giant path stalled everything.</strong> A proposal with a path half a million parts long held the record's lock for a minute. Named fields are now capped at 1,024 characters.</li>
+          <li><strong>Invisible characters disguised file names.</strong> A name could read as a PDF and be a program. Names that contain those characters are refused.</li>
+          <li><strong>The policy warning had blind spots.</strong> It missed two ways the calling account could still change the policy.</li>
+          <li><strong>The pointer to the gate's home could be redirected.</strong> It must now belong to the system administrator's account and be a full path. A bad one stops both tools.</li>
+          <li><strong>The help flag reported success.</strong> Asking for help exited with the same code as a completed filing.</li>
+        </ol>
+      </div>
+      <div>
+        <h2 class="heading">What code alone does not settle</h2>
+        <p>Some of what the review raised depends on how the gate is installed for a client. The gate has to run under its own account, which the agent's account cannot change. Run under the agent's own account it is a check and not a barrier, and it warns when the calling account could rewrite its policy. The folder that holds approvals belongs to the approval step alone, and each engagement gets its own signing keys. The record proves itself only against a fingerprint the client already holds, which is why one goes out with every report.</p>
+        <p>Two design questions are still open: whether an approval should expire, and whether the engagement should be written into each signature.</p>
+      </div>
+      <div>
+        <h2 class="heading">The numbers</h2>
+        <p>The gate's tests went from 81 to 105. A mutation check, which breaks the code on purpose to see whether the tests notice, was caught 34 times out of 34. The gate has not yet run for a client. The review came first.</p>
+      </div>
+      <div>
+        <h2 class="heading">What we took from it</h2>
+        <p>Most of the 14 were not in the approval logic. They were at the edges: files, paths, keys, settings and exit codes. A test of any system that puts an agent near something that matters should start there. That is how we approach <a class="textlink" href="/penetration-testing">penetration tests of AI applications and agents</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="dawn" aria-hidden="true"><canvas class="stars" data-seed="77" data-reach=".42"></canvas></div>
+
+  <div class="day">
+    <section class="band" id="contact" aria-labelledby="contact-title">
+      <div class="wrap block">
+        <div class="head">
+          <h2 class="headline" id="contact-title">Tell us what you want tested, or what you want handled.</h2>
+          <p class="lede">Send a few lines about the work, or book a 30-minute call. A person reads every message and replies.</p>
+        </div>
+        <a class="email" href="mailto:info@midnira.ai">info@midnira.ai</a>
+        <div class="actions">
+          <a class="btn btn-ink" href="https://calendly.com/derek-midnira/30min" rel="noopener">Book a 30-minute call</a>
+          <a class="btn btn-ink-quiet" href="mailto:info@midnira.ai?subject=Penetration%20test">Email about a penetration test</a>
+          <a class="btn btn-ink-quiet" href="mailto:info@midnira.ai?subject=AI%20operations">Email about AI operations</a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p>&copy; 2026 Midnira LLC</p>
+        <div class="notes">
+          <p>Penetration testing is performed only with written authorization from the system owner.</p>
+          <p>This site counts visits with Cloudflare Web Analytics, which sets no cookies. <a href="/privacy">Privacy</a></p>
+        </div>
+      </div>
+    </footer>
+  </div>
+</main>
+
+<script src="site.js"></script>
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "62c4091366b54e349874377e16bdb1ef"}'></script><!-- End Cloudflare Web Analytics -->
+</body>
+</html>

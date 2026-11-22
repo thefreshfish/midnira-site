@@ -41,6 +41,8 @@ def problems(html):
     if re.search(r"<style[\s>]", html):
         found.append("an inline <style> block")
     for attrs, body in re.findall(r"<script\b([^>]*)>(.*?)</script>", html, re.S):
+        if 'type="application/ld+json"' in attrs:
+            continue   # structured data is read, never run, so the policy does not apply to it
         if "src=" not in attrs or body.strip():
             found.append("an inline <script>")
     for tag in re.findall(r"<[a-zA-Z][^>]*>", html):
