@@ -263,16 +263,8 @@
     var excluded = ip4('10.20.0.53');
     var hostname = /^(?=.{1,253}$)[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$/;
 
-    /* The map at the top of the page rings the cell the gate was asked about. */
-    var map = document.querySelector('.scopemap');
-    var say = function (state, text, mark) {
+    var say = function (state, text) {
       verdict.setAttribute('data-state', state);
-      if (map) {
-        var old = map.querySelectorAll('.is-probe');
-        for (var o = 0; o < old.length; o++) old[o].classList.remove('is-probe', 'is-allowed', 'is-blocked');
-        var hit = mark ? map.querySelector('[data-mark="' + mark + '"]') : null;
-        if (hit) hit.classList.add('is-probe', state === 'allowed' ? 'is-allowed' : 'is-blocked');
-      }
       verdict.querySelector('strong').textContent = state === 'allowed' ? 'Allowed.' : 'Blocked.';
       verdict.querySelector('span').textContent = text;
     };
@@ -286,12 +278,12 @@
       var address = ip4(target);
       if (address !== null) {
         var shown = dotted(address);
-        if (address === excluded) return say('blocked', shown + ' is excluded by name in the authorization. The agent stops and the attempt is logged.', shown);
-        if (address >= netBase && address < netBase + netSize) return say('allowed', shown + ' is inside 10.20.0.0/24, which the signed scope lists.', shown);
-        return say('blocked', shown + ' is outside the signed scope. The agent never contacts it.', shown);
+        if (address === excluded) return say('blocked', shown + ' is excluded by name in the authorization. The agent stops and the attempt is logged.');
+        if (address >= netBase && address < netBase + netSize) return say('allowed', shown + ' is inside 10.20.0.0/24, which the signed scope lists.');
+        return say('blocked', shown + ' is outside the signed scope. The agent never contacts it.');
       }
       if (hostname.test(target)) {
-        if (hosts.indexOf(target) !== -1) return say('allowed', target + ' is listed in the signed scope.', target);
+        if (hosts.indexOf(target) !== -1) return say('allowed', target + ' is listed in the signed scope.');
         if (/(^|\.)example\.com$/.test(target)) return say('blocked', target + ' is not listed. A related name is not assumed to be in scope.');
         return say('blocked', target + ' is not in the signed scope. The agent never contacts it.');
       }

@@ -1,7 +1,7 @@
 """Draws the figures at the top of the two practice pages.
 
   ai-operations.html        routes: the night's mail, carried to a sign-off line
-  penetration-testing.html  scopemap: the signed scope as a map of 10.20.0.0/24
+  penetration-testing.html  trail: the agents' checks, the leads they flag, and what the operator proves
 
 Run from the site folder:
 
@@ -10,9 +10,8 @@ Run from the site folder:
 Each figure is rewritten between its <!-- name:start --> and <!-- name:end -->
 comments. Colors, type and motion come from classes in site.css. The
 interactions are in site.js: approvals in the morning queue turn a route amber
-and file it (data-doc, data-folder), and a check in the scope gate rings the
-cell it names (data-mark). Keep those values in step with the queue and the
-gate on the same page.
+and file it (data-doc, data-folder). Keep those values in step with the queue
+on the same page. The trail has no interaction.
 """
 import pathlib
 
@@ -107,53 +106,87 @@ def routes():
     return "\n".join(out)
 
 
-# ---- scope map ---------------------------------------------------------------
-LEFT, TOP, PITCH, CELL = 64, 112, 30, 26
-HOSTS = [1, 2, 10, 11, 14, 20, 21, 33, 40, 64, 65, 80, 100, 101, 128, 129, 150, 200, 201, 250, 254]
-EXCLUDED = 53
+# ---- trail -------------------------------------------------------------------
+# The same example as the sample finding on the page, the home page's night log and
+# the sample report: the agent flags an invoice endpoint at 3:18 AM, the operator
+# reproduces it at 8:40 AM (F-01, High), and the operator's own test of credit
+# notes adds F-02 (Medium). Keep the times and numbers in step with those.
+LINE_X = 384          # the operator
+SHEET_X = 426         # the report
+TICK, STEP, COLS = 14, 20, 10
+BANDS = [("api.example.com", 82, 6), ("app.example.com", 240, 7)]    # name, first row's y, rows
+# (name, flagged, band, row, column, y on the operator's line, where its label sits)
+LEADS = [
+    ("Invoice endpoint", "Flagged 3:18 AM", 0, 2, 9, 129, "above"),
+    ("Outdated version", "Flagged 1:52 AM", 1, 4, 9, 352, "below"),
+]
+OWN_Y = 224           # the operator's own test, with no lead behind it
 
 
-def scopemap():
-    found = len(HOSTS) + 2
+def trail():
     out = []
-    out.append('<svg class="figure scopemap" viewBox="0 0 600 684" role="img" aria-labelledby="scope-title scope-desc">')
-    out.append('  <title id="scope-title">The signed scope, as a map</title>')
-    out.append('  <desc id="scope-desc">Two hostnames and the 256 addresses of 10.20.0.0/24 are in scope. The agent checked '
-               'each one and found %d hosts. 10.20.0.53, the production database, is excluded by name and was never '
-               'contacted, and nothing in 10.20.1.0/24 was touched. One finding, on api.example.com, was reproduced by the '
-               'operator.</desc>' % found)
-    # hostnames
-    for x, name in [(LEFT, "app.example.com"), (LEFT + 248, "api.example.com")]:
-        out.append('  <g class="host" data-r="0">')
-        out.append('    <rect class="host-cell" data-mark="%s" x="%d" y="16" width="228" height="48" rx="6"/>' % (name, x))
-        out.append('    <text class="host-name" x="%d" y="46">%s</text>' % (x + 114, name))
-        if name.startswith("api"):
-            out.append('    <circle class="finding" cx="%d" cy="16" r="8"/>' % (x + 228))
+    out.append('<svg class="figure trail" viewBox="0 0 640 416" role="img" aria-labelledby="trail-title trail-desc">')
+    out.append('  <title id="trail-title">From the agents\' checks to your report</title>')
+    out.append('  <desc id="trail-desc">Overnight, agents check the two hostnames in scope and flag two leads for the operator: '
+               'an outdated version number at 1:52 AM and an invoice endpoint at 3:18 AM. The operator reproduces the invoice '
+               'finding by hand at 8:40 AM, and it goes into the report as F-01, High. The operator\'s own test of credit '
+               'notes adds F-02, Medium. The version number turns out to be patched already, so it is ruled out and stays '
+               'out of the report.</desc>')
+    out.append('  <text class="col-agent" x="20" y="34">Agents, overnight</text>')
+    lead_at = {(b, r, c): i for i, (_, _, b, r, c, _, _) in enumerate(LEADS)}
+    n = 0
+    for b, (name, top, rows) in enumerate(BANDS):
+        out.append('  <text class="host-name" x="20" y="%d">%s</text>' % (top - 12, name))
+        for r in range(rows):
+            n += 1
+            out.append('  <g class="row" data-r="%d">' % n)
+            for c in range(COLS):
+                x, y = 20 + c * STEP, top + r * STEP
+                if (b, r, c) in lead_at:
+                    out.append('    <rect class="tick is-lead" x="%d" y="%d" width="%d" height="%d" rx="3"/>' % (x, y, TICK, TICK))
+                else:
+                    out.append('    <rect class="tick" x="%d" y="%d" width="%d" height="%d" rx="3"/>' % (x, y, TICK, TICK))
+            out.append('  </g>')
+    # the operator
+    out.append('  <line class="gate-line" x1="%d" y1="48" x2="%d" y2="400"/>' % (LINE_X, LINE_X))
+    out.append('  <text class="gate-name" x="%d" y="34">Operator</text>' % LINE_X)
+    # the report
+    out.append('  <rect class="sheet" x="%d" y="56" width="204" height="212" rx="3"/>' % SHEET_X)
+    out.append('  <text class="sheet-head" x="%d" y="88">Your report</text>' % (SHEET_X + 14))
+    out.append('  <line class="sheet-rule" x1="%d" y1="101" x2="%d" y2="101"/>' % (SHEET_X + 14, SHEET_X + 190))
+    out.append('  <line class="sheet-rule" x1="%d" y1="178" x2="%d" y2="178"/>' % (SHEET_X + 14, SHEET_X + 190))
+    # leads: a tick the agent flagged, its route to the operator, and where it waits
+    for i, (name, flagged, b, r, c, yl, side) in enumerate(LEADS):
+        x0 = 20 + c * STEP + TICK + 3
+        y0 = BANDS[b][1] + r * STEP + TICK // 2
+        out.append('  <g class="flag" data-i="%d">' % i)
+        out.append('    <circle class="lead-ring" cx="%d" cy="%d" r="11"/>' % (x0 - 3 - TICK // 2, y0))
+        ny, ty = (yl - 20, yl + 26) if side == "above" else (yl + 28, yl + 50)
+        out.append('    <text class="lead-name" x="%d" y="%d">%s</text>' % (LINE_X - 14, ny, name))
+        out.append('    <text class="lead-time" x="%d" y="%d">%s</text>' % (LINE_X - 14, ty, flagged))
+        out.append('    <circle class="wait" cx="%d" cy="%d" r="7"/>' % (LINE_X, yl))
         out.append('  </g>')
-    # the in-scope network
-    out.append('  <text class="net-name" x="%d" y="98">10.20.0.0/24</text>' % LEFT)
-    for r in range(16):
-        y = TOP + r * PITCH
-        out.append('  <g class="row" data-r="%d">' % (r + 1))
-        out.append('    <text class="row-label" x="%d" y="%d">.%d</text>' % (LEFT - 10, y + 18, r * 16))
-        for c in range(16):
-            n, x = r * 16 + c, LEFT + c * PITCH
-            if n == EXCLUDED:
-                out.append('    <rect class="cell is-excluded" data-mark="10.20.0.%d" x="%d" y="%d" width="%d" height="%d" rx="4"/>'
-                           % (n, x, y, CELL, CELL))
-                out.append('    <path class="x-mark" d="M %d %d l 12 12 m 0 -12 l -12 12"/>' % (x + 7, y + 7))
-            else:
-                kind = "cell is-host" if n in HOSTS else "cell"
-                out.append('    <rect class="%s" data-mark="10.20.0.%d" x="%d" y="%d" width="%d" height="%d" rx="4"/>'
-                           % (kind, n, x, y, CELL, CELL))
+        out.append('  <path class="lead" data-i="%d" pathLength="1" d="M %d %d C %d %d %d %d %d %d"/>'
+                   % (i, x0 + 2, y0, x0 + 70, y0, LINE_X - 80, yl, LINE_X - 8, yl))
+    # the operator's own test
+    out.append('  <text class="lead-name" x="%d" y="%d">Credit notes</text>' % (LINE_X - 14, OWN_Y + 6))
+    # what the operator proved goes into the report
+    for i, (y, fid, sev, how) in enumerate([(LEADS[0][5], "F-01", "High", "Reproduced 8:40 AM"),
+                                             (OWN_Y, "F-02", "Medium", "Operator's own test")]):
+        out.append('  <path class="proven" data-i="%d" pathLength="1" d="M %d %d H %d"/>' % (i, LINE_X, y, SHEET_X))
+        out.append('  <g class="verdict" data-i="%d">' % i)
+        out.append('    <circle class="wait is-done" cx="%d" cy="%d" r="7"/>' % (LINE_X, y))
+        out.append('    <text class="fid" x="%d" y="%d">%s</text>' % (SHEET_X + 14, y - 2, fid))
+        out.append('    <text class="sev" x="%d" y="%d">%s</text>' % (SHEET_X + 62, y - 2, sev))
+        out.append('    <text class="how" x="%d" y="%d">%s</text>' % (SHEET_X + 14, y + 22, how))
         out.append('  </g>')
-    # the next network over, which the scope does not name
-    y = TOP + 16 * PITCH + 46
-    out.append('  <text class="net-name is-outside" x="%d" y="%d">10.20.1.0/24, outside the scope</text>' % (LEFT, y - 12))
-    out.append('  <g class="row" data-r="17">')
-    for c in range(16):
-        out.append('    <rect class="cell is-outside" data-mark="10.20.1.%d" x="%d" y="%d" width="%d" height="%d" rx="4"/>'
-                   % (c, LEFT + c * PITCH, y, CELL, CELL))
+    # what did not hold up stays out of it
+    y = LEADS[1][5]
+    out.append('  <g class="verdict" data-i="2">')
+    out.append('    <path class="dropped" d="M %d %d H %d"/>' % (LINE_X + 8, y, SHEET_X - 2))
+    out.append('    <path class="x-mark" d="M %d %d l 10 10 m 0 -10 l -10 10"/>' % (SHEET_X + 4, y - 5))
+    out.append('    <text class="out-name" x="%d" y="%d">Ruled out</text>' % (SHEET_X + 28, y - 2))
+    out.append('    <text class="out-why" x="%d" y="%d">Already patched</text>' % (SHEET_X + 28, y + 22))
     out.append('  </g>')
     out.append('</svg>')
     return "\n".join(out)
@@ -161,5 +194,5 @@ def scopemap():
 
 if __name__ == "__main__":
     put("ai-operations.html", "routes", routes())
-    put("penetration-testing.html", "scopemap", scopemap())
-    print("figures: drew routes and scopemap")
+    put("penetration-testing.html", "trail", trail())
+    print("figures: drew routes and trail")
