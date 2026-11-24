@@ -608,7 +608,6 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
 
 /* Round 4: answers, roles, timelines, a sample record, a privacy page */
 .steps li > * { grid-column: 2; }
-.steps.of-test li::before { color: color-mix(in srgb, var(--test) 50%, var(--night-0)); }
 .steps .when { margin-top: .15rem; font-size: .875rem; font-weight: 600; color: var(--dim); }
 .blurb { max-width: 46rem; color: var(--mist); }
 
@@ -697,3 +696,65 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
 /* A numbered list inside a text page (the field note). */
 .prose .repro { gap: .7rem; color: var(--mist); }
 .prose .repro strong { font-weight: 650; color: var(--moon); }
+
+/* How a test runs, on one line: what the client hands over above it, what comes
+   back below it. The amber line is the signed authorization, and the band after
+   it is the test window. Stacked on narrow screens, with the line down the side. */
+.timeline .lane { display: none; font-size: .875rem; font-weight: 650; color: var(--dim); }
+.stations { --trace: color-mix(in srgb, var(--test) 50%, var(--night-0)); display: grid; counter-reset: station; }
+.stations > li { counter-increment: station; position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: .9rem clamp(1.5rem, 4vw, 3rem); align-content: start; padding: 0 0 2.4rem 4rem; }
+.stations > li:last-child { padding-bottom: 0; }
+.stations > li::before { content: ""; position: absolute; left: .55rem; top: 3.5rem; bottom: .35rem; width: 2px; background: var(--trace); }
+.stations > li:last-child::before { content: none; }
+.stations > .is-test::before { left: .3rem; width: .6rem; border-radius: 999px; background: linear-gradient(90deg, var(--test) 0 42%, transparent 42% 58%, var(--lamp) 58% 100%); }
+.stations > .is-test::after { content: ""; position: absolute; left: 0; right: 0; top: -1.25rem; border-top: 2px dashed var(--lamp); }
+.station { grid-column: 1 / -1; min-height: 3rem; }
+.station::before { content: counter(station); position: absolute; left: 0; top: 0; font-size: 3.4rem; font-weight: 760; font-stretch: 70%; line-height: .9; color: var(--trace); }
+.station h4 { font-size: 1.0625rem; font-weight: 650; }
+.station .when { margin-top: .15rem; font-size: .875rem; font-weight: 600; color: var(--dim); }
+.station .when.is-gate { color: var(--lamp); }
+.give { grid-column: 1; }
+.get { grid-column: 2; }
+.give, .get { display: grid; gap: .45rem; align-content: start; }
+.timeline .dir { font-size: .8125rem; font-weight: 650; color: var(--dim); }
+.give > ul, .get > ul { display: grid; gap: .6rem; color: var(--mist); font-size: 1rem; line-height: 1.45; }
+.give > ul > li, .get > ul > li { padding-left: 1.2rem; }
+.give > ul > li { background: radial-gradient(circle at .3rem .72rem, transparent 0 .11rem, var(--moon) .13rem .23rem, transparent .26rem) no-repeat; }
+.get > ul > li { background: radial-gradient(circle at .3rem .72rem, var(--lamp) 0 .2rem, transparent .23rem) no-repeat; }
+.get > ul > .sheet { display: grid; gap: .6rem; max-width: 22rem; padding: .95rem 1.05rem 1.05rem; border-radius: 3px; background: var(--paper); color: var(--ink); font: 400 .9375rem/1.45 var(--serif); box-shadow: 0 22px 40px -22px rgb(0 0 0 / .8); }
+.sheet-name { font: 650 1.0625rem/1.2 var(--serif); letter-spacing: -.005em; }
+.sheet ul { display: grid; gap: .35rem; padding-top: .6rem; border-top: 1px solid color-mix(in srgb, var(--ink) 16%, transparent); }
+.sheet a { font-weight: 600; text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--ink) 40%, transparent); text-underline-offset: .2em; }
+.sheet a:hover { text-decoration-color: var(--ink-amber); }
+.sheet :focus-visible { outline-color: var(--ink); }
+.legend-start { justify-content: flex-start; }
+@media (max-width: 640px) {
+  .stations > li { grid-template-columns: minmax(0, 1fr); padding-left: 3.2rem; }
+  .give, .get { grid-column: 1; }
+}
+@media (min-width: 1081px) {
+  @supports (grid-template-rows: subgrid) {
+    .timeline { display: grid; grid-template-columns: 5rem minmax(0, 1fr); grid-template-rows: auto auto auto; }
+    .timeline .lane { display: block; grid-column: 1; }
+    .timeline .lane-give { grid-row: 1; align-self: end; padding-bottom: 1.5rem; }
+    .timeline .lane-get { grid-row: 3; padding-top: 1.35rem; }
+    .timeline .dir { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    .stations { grid-column: 2; grid-row: 1 / span 3; grid-template-rows: subgrid; grid-template-columns: 1.15fr 1.05fr 1.3fr 1.3fr .85fr 1.15fr; }
+    .stations > li { grid-row: 1 / span 3; grid-template-rows: subgrid; grid-template-columns: minmax(0, 1fr); gap: 0; padding: 0; }
+    .stations > li::before { content: none; }
+    .stations > .is-test { padding-left: 1.1rem; }
+    .stations > .is-test::after { right: auto; top: 0; bottom: 0; border-top: 0; border-left: 2px dashed var(--lamp); }
+    .station { grid-row: 2; grid-column: 1; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; align-content: start; gap: 0 .7rem; min-height: 0; }
+    .station::before { position: static; grid-area: 1 / 1; }
+    .station::after { content: ""; grid-area: 1 / 2; height: 2px; background: var(--trace); }
+    .stations > li:last-child .station::after { background: linear-gradient(90deg, var(--trace), transparent); }
+    .is-test .station::after { height: .6rem; border-radius: 999px; background: linear-gradient(var(--test) 0 42%, transparent 42% 58%, var(--lamp) 58% 100%); }
+    .station h4 { grid-area: 2 / 1 / auto / -1; margin-top: .55rem; padding-right: 1.25rem; }
+    .station .when { grid-area: 3 / 1 / auto / -1; padding-right: 1.25rem; }
+    .give { grid-row: 1; grid-column: 1; align-self: end; padding: 0 1.5rem 1.4rem 0; }
+    .get { grid-row: 3; grid-column: 1; padding: 1.25rem 1.5rem 0 0; }
+    .give > ul, .get > ul { font-size: .9375rem; }
+    .get > ul > .sheet { transform: rotate(-.8deg); }
+    .stations > li:last-child .sheet { transform: rotate(.9deg); }
+  }
+}

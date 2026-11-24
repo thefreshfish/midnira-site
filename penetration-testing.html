@@ -485,24 +485,19 @@ NUCLEI_EXCLUDED_TAGS = frozenset({"dos", "intrusive", "fuzz", "default-login"})<
 
         <div class="flow">
           <div class="block">
-            <h3 class="heading">What you receive</h3>
-            <ul class="gets">
-              <li>A report with reproducible steps and severity ratings</li>
-              <li>Detection notes for every High and Critical finding: how to spot the attack in your logs</li>
-              <li>A prioritized fix list</li>
-              <li>A readout call with your team</li>
-              <li>A retest of the fixes</li>
-              <li>A signed attestation letter for auditors, insurers and customers</li>
-            </ul>
-            <p class="blurb"><a class="textlink" href="/sample-report-excerpt.pdf" target="_blank" rel="noopener">See an excerpt of a sample report</a></p>
-            <p class="blurb"><a class="textlink" href="/sample-attestation-letter.pdf" target="_blank" rel="noopener">See a sample attestation letter</a></p>
-          </div>
-          <div class="block">
             <h3 class="heading">Ways to engage</h3>
             <dl class="pairs">
               <div><dt>Agentic penetration test</dt><dd>Agent-assisted and operator-led. More coverage inside the same test window, with every agent action logged.</dd></div>
               <div><dt>Manual penetration test</dt><dd>Testing by hand, without AI tooling, for environments where it is not permitted.</dd></div>
               <div><dt>Retests and recurring tests</dt><dd>Fixes are re-checked after remediation. Teams that ship often can book testing on a regular cadence.</dd></div>
+            </dl>
+          </div>
+          <div class="block">
+            <h3 class="heading">How we price</h3>
+            <dl class="pairs">
+              <div><dt>A fixed price for a defined scope</dt><dd>Quoted in writing after the scoping call. One retest of the fixes is included.</dd></div>
+              <div><dt>Where prices start</dt><dd>A test of one web application and its API starts at $5,000.</dd></div>
+              <div><dt>What sets the price</dt><dd>The number of applications, user roles, addresses and cloud accounts, and how deep the testing goes.</dd></div>
             </dl>
           </div>
         </div>
@@ -530,35 +525,73 @@ NUCLEI_EXCLUDED_TAGS = frozenset({"dos", "intrusive", "fuzz", "default-login"})<
 
       <div class="block">
         <h3 class="heading">How a test runs</h3>
-        <ol class="steps of-test">
-          <li><h4>Scoping call</h4><p class="when">30 minutes</p><p>We agree what is in scope, what is left alone and when testing can happen.</p></li>
-          <li><h4>Authorization</h4><p>You sign the scope, the test window and the emergency contacts. Nothing starts before this.</p></li>
-          <li><h4>Testing</h4><p class="when">One to two weeks</p><p>The agent and the operator work inside the window. You hear about a high-severity finding the same day.</p></li>
-          <li><h4>Report</h4><p class="when">Within five business days</p><p>Findings with steps to reproduce, severity ratings and a prioritized fix list.</p></li>
-          <li><h4>Readout</h4><p>A call with your team to walk through the findings and the fixes.</p></li>
-          <li><h4>Retest</h4><p class="when">Within 60 days</p><p>We check that the fixes hold and update the report.</p></li>
-        </ol>
-      </div>
-
-      <div class="split">
-        <div class="block">
-          <h3 class="heading">What we need from you</h3>
-          <ul class="gets">
-            <li>The applications, hosts and addresses in scope, and anything to leave alone</li>
-            <li>Test accounts for each role we should test</li>
-            <li>A test window, and who to call if something looks wrong</li>
-            <li>A signature from someone who can authorize testing of these systems</li>
-          </ul>
-          <p class="blurb">We give you the address the testing comes from, so your team can recognize it.</p>
+        <div class="timeline">
+          <p class="lane lane-give" aria-hidden="true">From you</p>
+          <p class="lane lane-get" aria-hidden="true">To you</p>
+          <ol class="stations">
+            <li>
+              <div class="station"><h4>Scoping call</h4><p class="when">30 minutes</p></div>
+              <div class="give"><p class="dir">From you</p><ul>
+                <li>The applications, hosts and addresses in scope, and anything to leave alone</li>
+                <li>A test window, and who to call if something looks wrong</li>
+              </ul></div>
+              <div class="get"><p class="dir">To you</p><ul>
+                <li>A fixed price, quoted in writing</li>
+              </ul></div>
+            </li>
+            <li>
+              <div class="station"><h4>Authorization</h4><p class="when is-gate">Nothing starts before this</p></div>
+              <div class="give"><p class="dir">From you</p><ul>
+                <li>Test accounts for each role we should test</li>
+                <li>A signature from someone who can authorize testing of these systems</li>
+              </ul></div>
+              <div class="get"><p class="dir">To you</p><ul>
+                <li>The address the testing comes from, so your team can recognize it</li>
+              </ul></div>
+            </li>
+            <li class="is-test">
+              <div class="station"><h4>Testing</h4><p class="when">One to two weeks</p></div>
+              <div class="get"><p class="dir">To you</p><ul>
+                <li>You hear about a high-severity finding the same day</li>
+              </ul></div>
+            </li>
+            <li>
+              <div class="station"><h4>Report</h4><p class="when">Within five business days</p></div>
+              <div class="get"><p class="dir">To you</p><ul>
+                <li class="sheet">
+                  <p class="sheet-name">Your report</p>
+                  <ul>
+                    <li>Reproducible steps and severity ratings</li>
+                    <li>Detection notes for every High and Critical finding: how to spot the attack in your logs</li>
+                    <li>A prioritized fix list</li>
+                  </ul>
+                  <p><a href="/sample-report-excerpt.pdf" target="_blank" rel="noopener">See an excerpt of a sample report</a></p>
+                </li>
+              </ul></div>
+            </li>
+            <li>
+              <div class="station"><h4>Readout</h4></div>
+              <div class="get"><p class="dir">To you</p><ul>
+                <li>A call with your team to walk through the findings and the fixes</li>
+              </ul></div>
+            </li>
+            <li>
+              <div class="station"><h4>Retest</h4><p class="when">Within 60 days</p></div>
+              <div class="give"><p class="dir">From you</p><ul>
+                <li>Your fixes</li>
+              </ul></div>
+              <div class="get"><p class="dir">To you</p><ul>
+                <li>We check that the fixes hold and update the report</li>
+                <li class="sheet">
+                  <p class="sheet-name">A signed attestation letter</p>
+                  <p>For auditors, insurers and customers</p>
+                  <p><a href="/sample-attestation-letter.pdf" target="_blank" rel="noopener">See a sample attestation letter</a></p>
+                </li>
+              </ul></div>
+            </li>
+          </ol>
         </div>
-        <div class="block">
-          <h3 class="heading">How we price</h3>
-          <dl class="pairs">
-            <div><dt>A fixed price for a defined scope</dt><dd>Quoted in writing after the scoping call. One retest of the fixes is included.</dd></div>
-            <div><dt>Where prices start</dt><dd>A test of one web application and its API starts at $5,000.</dd></div>
-            <div><dt>What sets the price</dt><dd>The number of applications, user roles, addresses and cloud accounts, and how deep the testing goes.</dd></div>
-          </dl>
-        </div>
+        <p class="legend legend-start"><span class="k-test">The agent</span><span class="k-person">The operator</span></p>
       </div>
 
       <div class="block" id="compare">
