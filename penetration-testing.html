@@ -620,18 +620,14 @@ NUCLEI_EXCLUDED_TAGS = frozenset({"dos", "intrusive", "fuzz", "default-login"})<
         <div class="head">
           <h2 class="headline">The questions buyers ask, answered.</h2>
         </div>
-        <dl class="qa">
-          <div><dt>Is it safe to run on production?</dt><dd>Yes, with limits. The agent maps and checks for known weaknesses at a controlled rate. Anything that could interrupt service or change data needs your approval in advance, and you choose the test window. We can also test a staging copy if you have one.</dd></div>
-          <div><dt>Who checks what the agent finds?</dt><dd>The operator. Every finding in your report has been reproduced by hand, so an agent's false alarm does not reach you.</dd></div>
-          <div><dt>What does the AI provider see?</dt><dd>The agents run on Claude, the AI model made by Anthropic. Test data that passes through the agents is not used for model training. Your agreement names the AI tooling and explains how your data is handled, including how long the provider keeps it.</dd></div>
-          <div><dt>Who sees our systems and data?</dt><dd>One person at Midnira: the founder, who runs your test. There are no subcontractors and no offshore staff, and Midnira is based in the United States. Anthropic processes the text the agents read, as the model provider.</dd></div>
-          <div><dt>How is the report delivered, and how long is the evidence kept?</dt><dd>The report and its evidence are sent to you encrypted. Your agreement sets how long the evidence is kept. It is then deleted, and the deletion is confirmed in writing.</dd></div>
-          <div><dt>Can we sign an NDA first?</dt><dd>Yes. We sign an NDA before the scoping call if you want one.</dd></div>
-          <div><dt>Can you test without AI?</dt><dd>Yes. A manual test uses no AI tooling, for environments where it is not permitted.</dd></div>
-          <div><dt>How is this different from a vulnerability scan?</dt><dd>A scan lists known weaknesses. A penetration test shows what an attacker can do with them: which can be exploited, how they chain together and what they expose. Each finding comes with the steps to reproduce it.</dd></div>
-          <div><dt>How long does it take?</dt><dd>Most tests run one to two weeks, and the report follows within five business days. The scoping call sets the dates.</dd></div>
-          <div><dt>Is a retest included?</dt><dd>Yes. One retest of the fixes is included in the price.</dd></div>
-        </dl>
+        <div class="faq">
+          <details open><summary>Is it safe to run on production?</summary><p>Yes, with limits. The agent maps and checks for known weaknesses at a controlled rate. Anything that could interrupt service or change data needs your approval in advance, and you choose the test window. We can also test a staging copy if you have one.</p></details>
+          <details><summary>What does the AI provider see?</summary><p>The agents run on Claude, the AI model made by Anthropic. Test data that passes through the agents is not used for model training. Your agreement names the AI tooling and explains how your data is handled, including how long the provider keeps it.</p></details>
+          <details><summary>Who sees our systems and data?</summary><p>One person at Midnira: the founder, who runs your test. There are no subcontractors and no offshore staff, and Midnira is based in the United States. Anthropic processes the text the agents read, as the model provider.</p></details>
+          <details><summary>How is the report delivered, and how long is the evidence kept?</summary><p>The report and its evidence are sent to you encrypted. Your agreement sets how long the evidence is kept. It is then deleted, and the deletion is confirmed in writing.</p></details>
+          <details><summary>Can we sign an NDA first?</summary><p>Yes. We sign an NDA before the scoping call if you want one.</p></details>
+          <details><summary>How is this different from a vulnerability scan?</summary><p>A scan lists known weaknesses. A penetration test shows what an attacker can do with them: which can be exploited, how they chain together and what they expose. Each finding comes with the steps to reproduce it.</p></details>
+        </div>
       </div>
 
       <p class="crosslinks">Both of Midnira's practices run on <a class="textlink" href="/#method">the same three rules</a>. Read <a class="textlink" href="/#data">how your data is handled</a>, or see the other practice, <a class="textlink" href="/ai-operations">AI operations</a>.</p>

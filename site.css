@@ -803,3 +803,14 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
   .doc:nth-child(odd) { transform: rotate(-.9deg); }
   .doc:nth-child(even) { transform: rotate(.8deg); }
 }
+
+/* Questions that open. The first one starts open. */
+.faq { display: grid; max-width: 56rem; }
+.faq details { border-top: 1px solid var(--rule); }
+.faq details:last-child { border-bottom: 1px solid var(--rule); }
+.faq summary { position: relative; padding: 1.15rem 2.75rem 1.15rem 0; font-size: 1.0625rem; font-weight: 650; line-height: 1.35; color: var(--moon); cursor: pointer; list-style: none; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; position: absolute; right: .2rem; top: .8rem; font-size: 1.45rem; font-weight: 400; line-height: 1.3; color: var(--dim); }
+.faq details[open] > summary::after { content: "\2212"; }
+.faq summary:hover::after { color: var(--moon); }
+.faq details > p { max-width: 40rem; padding-bottom: 1.35rem; color: var(--mist); }
