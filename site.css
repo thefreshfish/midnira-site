@@ -758,3 +758,34 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
     .stations > li:last-child .sheet { transform: rotate(.9deg); }
   }
 }
+
+/* The harness, as the path one request takes: four checks that can refuse it, the
+   account a scan runs under, and the record both outcomes end in. Each step opens
+   to the full statement. */
+.checks { display: grid; max-width: 36rem; }
+.checks .asks { position: relative; display: grid; gap: .1rem; padding: 0 0 1.3rem 3rem; color: var(--mist); }
+.checks .asks span:first-child { font-weight: 600; color: var(--moon); }
+.checks .asks::before { content: ""; position: absolute; left: calc(1.5rem + 1px - .36rem); top: .45rem; width: .72rem; height: .72rem; border-radius: 50%; background: var(--test); }
+.checks .asks::after { content: ""; position: absolute; left: 1.5rem; top: 1.3rem; bottom: 0; width: 2px; background: var(--dim); }
+.checks ol { display: grid; }
+.checks ol > li { position: relative; padding: 0 0 1.2rem 3rem; }
+.checks ol > li::before { content: ""; position: absolute; left: 1.5rem; top: 0; bottom: 0; width: 2px; background: var(--dim); }
+.checks ol > li::after { content: ""; position: absolute; left: .3rem; top: 0; bottom: 0; width: 2px; background: repeating-linear-gradient(var(--stop) 0 5px, transparent 5px 10px); }
+.checks ol > li:first-child::after { top: .74rem; }
+.checks ol > .is-log { padding-bottom: 0; }
+.checks ol > .is-log::before, .checks ol > .is-log::after { bottom: auto; height: .34rem; }
+.checks .is-gate > details::before { content: ""; position: absolute; left: .3rem; top: calc(.74rem - 1px); width: .85rem; height: 2px; background: repeating-linear-gradient(90deg, var(--stop) 0 4px, transparent 4px 7px); }
+.checks summary { position: relative; display: grid; padding-right: 2rem; cursor: pointer; list-style: none; }
+.checks summary::-webkit-details-marker { display: none; }
+.checks summary::before { content: ""; position: absolute; left: calc(-1.5rem + 1px - .4rem); top: .34rem; width: .8rem; height: .8rem; border: 2px solid var(--moon); background: var(--night-0); transform: rotate(45deg); }
+.checks .is-run summary::before { border-color: var(--ok); border-radius: 50%; background: var(--ok); transform: none; }
+.checks .is-log summary::before { left: -3rem; top: .3rem; width: 2.15rem; height: .95rem; border-radius: 4px; background: var(--night-2); transform: none; }
+.checks summary::after { content: "+"; position: absolute; right: .15rem; top: -.1rem; font-size: 1.35rem; line-height: 1.3; color: var(--dim); }
+.checks details[open] > summary::after { content: "\2212"; }
+.checks summary:hover::after { color: var(--moon); }
+.checks .name { font-weight: 650; color: var(--moon); }
+.checks .gist { color: var(--mist); font-size: 1rem; }
+.checks details > p { margin-top: .55rem; color: var(--mist); font-size: .9375rem; line-height: 1.55; }
+.checks .legend { margin-top: 1.3rem; padding-left: 3rem; }
+.legend .k-ok::before { background: var(--ok); }
+.legend .k-no::before { background: none; border: 1.5px dashed var(--stop); }

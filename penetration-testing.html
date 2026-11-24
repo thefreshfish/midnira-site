@@ -364,15 +364,19 @@
       <div class="split split-code" id="harness">
         <div class="block">
           <h3 class="heading">A harness we built ourselves</h3>
-          <p class="blurb">The testing agent runs inside a harness that Midnira wrote. Off-the-shelf autonomous testing tools let the model drive. For work on a client's live systems, we wanted the limits in code that we own and can show you. The model chooses what to look at next. Code decides whether it may.</p>
-          <dl class="pairs">
-            <div><dt>Scope</dt><dd>Each target is checked against the signed authorization at the moment of contact. A name is looked up again every time, or tied to the server address written in the signed scope. A port scan is then given the approved addresses, not the name, and a web scan keeps the site's name but can only resolve it to the approved address. What cannot be verified is refused.</dd></div>
-            <div><dt>Options</dt><dd>Every tool has a short list of options it may use and speed caps the agent cannot lift. Anything else is refused.</dd></div>
-            <div><dt>Pace</dt><dd>One rate budget covers every worker, and only one scan runs against a host at a time, so agents running in parallel cannot crowd it.</dd></div>
-            <div><dt>Window</dt><dd>No scan starts outside the test window you signed, and one still running when the window closes is stopped.</dd></div>
-            <div><dt>Accounts</dt><dd>Scans run under a separate account, started only by the harness. The agent's own account has no route to your systems.</dd></div>
-            <div><dt>Record</dt><dd>Every decision goes into the log, the refusals too, with the exact command that ran.</dd></div>
-          </dl>
+          <p class="blurb">The testing agent runs inside a harness that Midnira wrote. Off-the-shelf autonomous testing tools let the model drive. For work on a client's live systems, we wanted the limits in code that we own and can show you.</p>
+          <div class="checks">
+            <p class="asks"><span>The model chooses what to look at next.</span> <span>Code decides whether it may.</span></p>
+            <ol>
+              <li class="is-gate"><details><summary><span class="name">Window</span> <span class="gist">Only inside the test window you signed</span></summary><p>No scan starts outside the test window you signed, and one still running when the window closes is stopped.</p></details></li>
+              <li class="is-gate"><details><summary><span class="name">Scope</span> <span class="gist">Only targets in the signed scope</span></summary><p>Each target is checked against the signed authorization at the moment of contact. A name is looked up again every time, or tied to the server address written in the signed scope. A port scan is then given the approved addresses, not the name, and a web scan keeps the site's name but can only resolve it to the approved address. What cannot be verified is refused.</p></details></li>
+              <li class="is-gate"><details><summary><span class="name">Options</span> <span class="gist">A short list of options, and speed caps</span></summary><p>Every tool has a short list of options it may use and speed caps the agent cannot lift. Anything else is refused.</p></details></li>
+              <li class="is-gate"><details><summary><span class="name">Pace</span> <span class="gist">One scan per host at a time</span></summary><p>One rate budget covers every worker, and only one scan runs against a host at a time, so agents running in parallel cannot crowd it.</p></details></li>
+              <li class="is-run"><details><summary><span class="name">Accounts</span> <span class="gist">The scan runs under a separate account</span></summary><p>Scans run under a separate account, started only by the harness. The agent's own account has no route to your systems.</p></details></li>
+              <li class="is-log"><details><summary><span class="name">Record</span> <span class="gist">Every decision is logged, refusals too</span></summary><p>Every decision goes into the log, the refusals too, with the exact command that ran.</p></details></li>
+            </ol>
+            <p class="legend legend-start"><span class="k-ok">Allowed</span><span class="k-no">Refused</span></p>
+          </div>
           <p class="blurb">No exploitation or denial-of-service tools are wired into it. Its tests run without touching a network, and each stage of the build gets a security review before the next begins. Our approval gate for AI operations was reviewed the same way: <a class="textlink" href="/gate-review">read what that review found</a>.</p>
         </div>
         <!-- harness:start -->
