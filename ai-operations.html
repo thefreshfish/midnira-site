@@ -242,13 +242,18 @@
       <div class="split split-code split-follow" id="approval-gate">
         <div class="block">
           <h3 class="heading">The approval is enforced in code</h3>
-          <p class="blurb">An instruction that tells a model to wait for approval can be ignored, or talked around by a cleverly worded document. So that rule does not live in the agent's instructions. Every filing passes through a gate that Midnira wrote, and the agent has no other way to file. The agent proposes. Code checks that a person approved.</p>
-          <dl class="pairs">
-            <div><dt>Approval</dt><dd>A filing goes ahead only when a person your firm has named as an approver has signed off. Until then the proposal waits.</dd></div>
-            <div><dt>Signature</dt><dd>Every approval is signed where your staff give it, and the gate checks that signature before it trusts anything else in the approval. The agent holds no signing key, so it cannot approve its own work.</dd></div>
-            <div><dt>Exact match</dt><dd>An approval covers the proposal as that person saw it and the document as it arrived. If either changes afterwards, the filing is refused until a person approves it again.</dd></div>
-            <div><dt>Your correction</dt><dd>When your staff change the folder, their choice is what gets filed. A filing only goes into a folder that already exists.</dd></div>
-          </dl>
+          <p class="blurb">An instruction that tells a model to wait for approval can be ignored, or talked around by a cleverly worded document. So that rule does not live in the agent's instructions. Every filing passes through a gate that Midnira wrote, and the agent has no other way to file.</p>
+          <div class="checks of-ops">
+            <p class="asks"><span>The agent proposes.</span> <span>Code checks that a person approved.</span></p>
+            <ol>
+              <li class="is-gate"><details><summary><span class="name">Approval</span> <span class="gist">Waits until a named approver signs off</span></summary><p>A filing goes ahead only when a person your firm has named as an approver has signed off. Until then the proposal waits.</p></details></li>
+              <li class="is-gate"><details><summary><span class="name">Signature</span> <span class="gist">The agent holds no signing key</span></summary><p>Every approval is signed where your staff give it, and the gate checks that signature before it trusts anything else in the approval. The agent holds no signing key, so it cannot approve its own work.</p></details></li>
+              <li class="is-gate"><details><summary><span class="name">Exact match</span> <span class="gist">The proposal and the document, unchanged</span></summary><p>An approval covers the proposal as that person saw it and the document as it arrived. If either changes afterwards, the filing is refused until a person approves it again.</p></details></li>
+              <li class="is-run"><details><summary><span class="name">Your correction</span> <span class="gist">Filed to the folder your staff chose</span></summary><p>When your staff change the folder, their choice is what gets filed. A filing only goes into a folder that already exists.</p></details></li>
+              <li class="is-log"><details><summary><span class="name">Record</span> <span class="gist">Every decision is recorded, holds and refusals too</span></summary><p>Every decision goes into the record, the holds and refusals too.</p></details></li>
+            </ol>
+            <p class="legend legend-start"><span class="k-ok">Filed</span><span class="k-no">Held or refused</span></p>
+          </div>
           <p class="fine">This gate had a security review before any client's documents went near it. <a class="textlink" href="/gate-review">Read what the review found</a></p>
         </div>
         <!-- gate:start -->
@@ -315,7 +320,7 @@ folder = approval.folder <span class="kw">or</span> proposal.folder
       <div class="split split-code split-follow" id="record-chain">
         <div class="block">
           <h3 class="heading">A record that checks itself</h3>
-          <p class="blurb">One approval files one document, once. Every decision goes into the record, the holds and refusals too.</p>
+          <p class="blurb">One approval files one document, once.</p>
           <dl class="pairs">
             <div><dt>Chained</dt><dd>Each row carries a fingerprint of the row before it. A row that is changed afterwards no longer fits the row after it.</dd></div>
             <div><dt>Anchored</dt><dd>The latest fingerprint goes to you with each report. A record rewritten later, however carefully, no longer matches the fingerprint you hold.</dd></div>
