@@ -370,13 +370,6 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
 
 .fieldnote { max-width: 50rem; font-size: clamp(1.25rem, .9vw + 1.05rem, 1.7rem); font-weight: 500; font-stretch: 92%; line-height: 1.38; color: var(--moon); }
 
-/* A real sequence, so it is numbered */
-.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem clamp(1.5rem, 4vw, 3.5rem); counter-reset: step; }
-.steps li { counter-increment: step; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0 1rem; }
-.steps li::before { content: counter(step); grid-column: 1; grid-row: 1 / span 4; font-size: 3.4rem; font-weight: 760; font-stretch: 70%; line-height: .9; color: color-mix(in srgb, var(--agent) 50%, var(--night-0)); }
-.steps h4 { font-size: 1.0625rem; font-weight: 650; }
-.steps p { margin-top: .25rem; color: var(--mist); font-size: 1rem; }
-
 /* Paper: the documents a test starts and ends with */
 .paper {
   position: relative;
@@ -441,9 +434,6 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
 .verdict[data-state="allowed"] strong { color: var(--ok); }
 .verdict[data-state="blocked"] strong { color: var(--stop); }
 
-.gets { display: grid; gap: .85rem; font-size: 1.125rem; line-height: 1.4; color: var(--moon); }
-.gets li { padding-left: 1.5rem; background: radial-gradient(circle at .3rem .75rem, var(--lamp) 0 .22rem, transparent .25rem) no-repeat; }
-
 /* How we work */
 .rules { display: grid; gap: clamp(1.75rem, 3.5vw, 2.5rem); }
 .rules > div { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: .5rem clamp(2rem, 5vw, 4.5rem); align-items: baseline; }
@@ -504,7 +494,6 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
   .hero-grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "copy" "dial" "log"; grid-template-rows: none; }
   .split, .split-wide-left, .split-wide-right, .queue { grid-template-columns: minmax(0, 1fr); }
   .rules > div { grid-template-columns: minmax(0, 1fr); }
-  .steps { grid-template-columns: minmax(0, 1fr); }
   .portrait { width: min(100%, 14rem); }
 }
 @media (max-width: 640px) {
@@ -607,8 +596,6 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
 }
 
 /* Round 4: answers, roles, timelines, a sample record, a privacy page */
-.steps li > * { grid-column: 2; }
-.steps .when { margin-top: .15rem; font-size: .875rem; font-weight: 600; color: var(--dim); }
 .blurb { max-width: 46rem; color: var(--mist); }
 
 /* Questions, answered: the question on the left, the answer beside it */
@@ -824,3 +811,14 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
 /* The approval gate, as the path one filing takes. It reuses the harness figure
    from the penetration testing page; only the agent's color differs. */
 .checks.of-ops .asks::before { background: var(--agent); }
+
+/* How an engagement runs (AI operations): the timeline with three stations. What
+   the firm hands over sits above each one, and what Midnira does sits below it. */
+.stations.of-ops { --trace: color-mix(in srgb, var(--agent) 50%, var(--night-0)); }
+.get > p:not(.dir) { color: var(--mist); font-size: 1rem; line-height: 1.45; }
+@media (min-width: 1081px) {
+  @supports (grid-template-rows: subgrid) {
+    .stations.of-ops { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .get > p:not(.dir) { font-size: .9375rem; }
+  }
+}
