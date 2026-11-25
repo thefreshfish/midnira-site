@@ -46,7 +46,7 @@ html { -webkit-text-size-adjust: 100%; }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 body {
   margin: 0;
-  background: var(--night-0);
+  background: var(--night-0) url("sky.svg");   /* faint stars behind the whole night ground; tools/sky.py draws the tile */
   color: var(--moon);
   font: 400 1.0625rem/1.6 var(--sans);
   -webkit-font-smoothing: antialiased;
