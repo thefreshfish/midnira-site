@@ -598,14 +598,6 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
 /* Round 4: answers, roles, timelines, a sample record, a privacy page */
 .blurb { max-width: 46rem; color: var(--mist); }
 
-/* Questions, answered: the question on the left, the answer beside it */
-.qa { display: grid; }
-.qa > div { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: .4rem clamp(2rem, 5vw, 4.5rem); align-items: baseline; padding: 1.2rem 0; border-top: 1px solid var(--rule); }
-.qa > div:last-child { border-bottom: 1px solid var(--rule); }
-.qa dt { font-size: 1.0625rem; font-weight: 650; line-height: 1.35; color: var(--moon); }
-.qa dd { max-width: 40rem; color: var(--mist); }
-.qa strong { font-weight: 650; color: var(--moon); }
-
 /* Who does what: the agent in its practice color, the operator in lamp amber,
    and what stays with the client as an open mark */
 .roles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem clamp(1.5rem, 4vw, 3.5rem); }
@@ -651,7 +643,7 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
 .prose > div { display: grid; gap: .8rem; max-width: 44rem; }
 .prose p { color: var(--mist); }
 @media (max-width: 900px) {
-  .qa > div, .roles { grid-template-columns: minmax(0, 1fr); }
+  .roles { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* Four facts under the hero's buttons. Each is stated in full further down the site. */
@@ -822,3 +814,10 @@ canvas.stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index:
     .get > p:not(.dir) { font-size: .9375rem; }
   }
 }
+
+/* The questions firms are told to ask. Each row shows the short answer beside the
+   question and opens to the full one. */
+.answers summary { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 17rem); gap: .2rem clamp(1.5rem, 4vw, 3rem); align-items: baseline; }
+.answers .short { font-weight: 500; color: var(--mist); }
+.faq strong { font-weight: 650; color: var(--moon); }
+@media (max-width: 700px) { .answers summary { grid-template-columns: minmax(0, 1fr); } }
